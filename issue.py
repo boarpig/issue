@@ -22,7 +22,12 @@ def list_issues(flags, tag):
         print(*issue, sep=" ")
 
 def close_issue(number):
-    pass
+    for issue in issues:
+        if int(issue[1]) == number:
+            issue[0] = 'closed'
+    with open("ISSUES", "w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(issues)
 
 def main():
     parser = argparse.ArgumentParser(description="Simple issue handler")
