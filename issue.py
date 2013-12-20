@@ -1,12 +1,24 @@
 #!/usr/bin/python
 
 import argparse
+import csv
 
 def new_issue(message):
     pass
 
-def list_issues():
-    pass
+def list_issues(flags, tag):
+    issues = []
+    with open("ISSUES") as f:
+        issues = list(csv.reader(f))
+    if not flags["all"]:
+        if flags["closed"]:
+            issues = [issue for issue in issues if issue[0] == "closed"]
+        else:
+            issues = [issue for issue in issues if issue[0] == "open"]
+    if tag:
+        issues = [issue for issue in issues if issue[2].lstrip() == tag]
+    for issue in issues:
+        print(*issue, sep=" ")
 
 def close_issue(number):
     pass
