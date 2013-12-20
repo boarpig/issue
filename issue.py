@@ -8,11 +8,11 @@ issues = []
 with open("ISSUES") as f:
     issues = list(csv.reader(f))
 
-def new_issue(message):
+def new_issue(message, tag):
     today = date.today().isoformat()
     largest = max([int(issue[1]) for issue in issues])
     number = largest + 1
-    issues.append(['open', number, 'bug', today, message])
+    issues.append(['open', number, tag, today, message])
     save_issues()
 
 def list_issues(flags, tag):
@@ -48,6 +48,8 @@ def main():
     new_parser.add_argument("-m", "--message", 
             help="""Message for the issue. if omitted, the $EDITOR will be
             invoked.""")
+    new_parser.add_argument("-t", "--tag", default="bug",
+            help="Specify tag for issue, default: %(default)s")
 
     list_parser = subparsers.add_parser("list", help="List issues")
     list_parser.add_argument("-a", "--all", action="store_true", 
@@ -62,7 +64,7 @@ def main():
     args = parser.parse_args()
 
     if args.subparser == "new":
-        new_issue(args.message)
+        new_issue(args.message, args.tag)
     elif args.subparser == "list":
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
     elif args.subparser == "close":
