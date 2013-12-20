@@ -2,13 +2,20 @@
 
 import argparse
 import csv
+from datetime import date
 
 issues = []
 with open("ISSUES") as f:
     issues = list(csv.reader(f))
 
 def new_issue(message):
-    pass
+    today = date.today().isoformat()
+    largest = max([int(issue[1]) for issue in issues])
+    number = largest + 1
+    issues.append(['open', number, 'bug', today, message])
+    with open("ISSUES", "w", newline='') as f:
+        writer = csv.writer(f)
+        writer.writerows(issues)
 
 def list_issues(flags, tag):
     global issues
