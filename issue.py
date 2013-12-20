@@ -3,10 +3,9 @@
 import argparse
 import csv
 from datetime import date
+from os.path import exists
 
 issues = []
-with open("ISSUES") as f:
-    issues = list(csv.reader(f))
 
 def new_issue(message, tag):
     today = date.today().isoformat()
@@ -33,6 +32,9 @@ def close_issue(number):
         if int(issue[1]) == number:
             issue[0] = 'closed'
     save_issues()
+
+def init():
+    open("ISSUES", "a").close()
 
 def save_issues():
     global issues
@@ -61,7 +63,22 @@ def main():
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
+    init_parser = subparsers.add_parser("init", help="Initialize issue file")
+
     args = parser.parse_args()
+
+    global issues
+    if exists("ISSUES"):
+        with open("ISSUES") as f:
+            issues = list(csv.reader(f))
+    else:
+        if args.subparser == "init":
+            init()
+        else:
+            print("ISSUES file does not exist. You can create one with\n\n"
+                    + " $ issue init\n")
+            exit()
+
 
     if args.subparser == "new":
         new_issue(args.message, args.tag)
@@ -70,7 +87,7 @@ def main():
     elif args.subparser == "close":
         close_issue(args.number)
     else:
-        parser.print_help()
+        parser.print_usage()
 
 if __name__=='__main__':
     main()
