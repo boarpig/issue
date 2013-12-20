@@ -13,9 +13,7 @@ def new_issue(message):
     largest = max([int(issue[1]) for issue in issues])
     number = largest + 1
     issues.append(['open', number, 'bug', today, message])
-    with open("ISSUES", "w", newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(issues)
+    save_issues()
 
 def list_issues(flags, tag):
     global issues
@@ -34,6 +32,10 @@ def close_issue(number):
     for issue in issues:
         if int(issue[1]) == number:
             issue[0] = 'closed'
+    save_issues()
+
+def save_issues():
+    global issues
     with open("ISSUES", "w", newline='') as f:
         writer = csv.writer(f)
         writer.writerows(issues)

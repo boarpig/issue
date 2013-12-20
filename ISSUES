@@ -2,4 +2,4 @@ closed, 1, bug, 2013-12-19, cannot list issues
 closed, 2, bug, 2013-12-19, cannot close issues
 closed, 3, bug, 2013-12-20, cannot add new issues
 open, 4, enhancement, 2013-12-20, open in editor
-open,5,bug,2013-12-20,move issues saving to separate function
+closed,5,bug,2013-12-20,move issues saving to separate function
