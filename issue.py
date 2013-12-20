@@ -23,12 +23,13 @@ def list_issues(flags, tag):
             issues = [issue for issue in issues if issue[0] == "open"]
     if tag:
         issues = [issue for issue in issues if issue[2].lstrip() == tag]
+    cols = [["STATUS", "NUMBER", "TAG", "DATE", "DESCRIPTION"]]
     lens = [0, 0, 0, 0, 0]
-    for issue in issues:
+    for issue in cols + issues:
         for i, v in enumerate(issue):
             if lens[i] < len(v):
                 lens[i] = len(v)
-    for issue in issues:
+    for issue in cols + issues:
         for i, col in enumerate(issue):
             print(col.ljust(lens[i] + 2, " "), end="")
         print()
