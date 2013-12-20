@@ -23,8 +23,15 @@ def list_issues(flags, tag):
             issues = [issue for issue in issues if issue[0] == "open"]
     if tag:
         issues = [issue for issue in issues if issue[2].lstrip() == tag]
+    lens = [0, 0, 0, 0, 0]
     for issue in issues:
-        print(*issue, sep=" ")
+        for i, v in enumerate(issue):
+            if lens[i] < len(v):
+                lens[i] = len(v)
+    for issue in issues:
+        for i, col in enumerate(issue):
+            print(col.ljust(lens[i] + 2, " "), end="")
+        print()
 
 def close_issue(number):
     global issues
