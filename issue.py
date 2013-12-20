@@ -25,7 +25,7 @@ def close_issue(number):
 
 def main():
     parser = argparse.ArgumentParser(description="Simple issue handler")
-    subparsers = parser.add_subparsers(help="subcommand help")
+    subparsers = parser.add_subparsers(help="subcommand help", dest="subparser")
 
     new_parser = subparsers.add_parser("new", help="Add new issue.")
     new_parser.add_argument("-m", "--message", 
@@ -37,19 +37,21 @@ def main():
             default=False, help="List all issues instead of open ones.")
     list_parser.add_argument("-c", "--closed", action="store_true", 
             default=False, help="List closed issues.")
-    list_parser.add_argument("-t", "--tag", help="List only specified tags")
+    list_parser.add_argument("-t", "--tag", help="List only specified tag")
 
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
     args = parser.parse_args()
 
-    if args.subparser_name == "new":
+    if args.subparser == "new":
         new_issue(args.message)
-    elif args.subparser_name == "list":
-        list_issues()
-    elif args.subparser_name == "close":
+    elif args.subparser == "list":
+        list_issues({"all": args.all, "closed": args.closed}, args.tag)
+    elif args.subparser == "close":
         close_issue(args.number)
+    else:
+        parser.print_help()
 
 if __name__=='__main__':
     main()
