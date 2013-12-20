@@ -11,6 +11,7 @@ def new_issue(message):
     pass
 
 def list_issues(flags, tag):
+    global issues
     if not flags["all"]:
         if flags["closed"]:
             issues = [issue for issue in issues if issue[0] == "closed"]
@@ -22,6 +23,7 @@ def list_issues(flags, tag):
         print(*issue, sep=" ")
 
 def close_issue(number):
+    global issues
     for issue in issues:
         if int(issue[1]) == number:
             issue[0] = 'closed'
