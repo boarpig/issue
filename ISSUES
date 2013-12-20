@@ -3,3 +3,6 @@ closed, 2, bug, 2013-12-19, cannot close issues
 closed, 3, bug, 2013-12-20, cannot add new issues
 open, 4, enhancement, 2013-12-20, open in editor
 closed,5,bug,2013-12-20,move issues saving to separate function
+open,6,bug,2013-12-21,add error checking
+open,7,enhancement,2013-12-21,make some sort of columns for issue list
+open,8,bug,2013-12-21,add issue editing
