@@ -41,6 +41,20 @@ def close_issue(number):
             issue[0] = 'closed'
     save_issues()
 
+def edit_issue(number, message, tag, close, reopen):
+    global issues
+    for issue in issues:
+        if int(issue[1]) == number:
+            if tag:
+                issue[3] = tag
+            if message:
+                issue[4] = message
+            if close:
+                issue[0] = 'closed'
+            if reopen:
+                issue[0] = 'open'
+    save_issues()
+
 def init():
     open("ISSUES", "a").close()
 
@@ -73,6 +87,18 @@ def main():
 
     init_parser = subparsers.add_parser("init", help="Initialize issue file")
 
+    edit_parser = subparsers.add_parser("edit", help="Edit issue.")
+    edit_parser.add_argument("number", type=int, help="Issue number to edit")
+    edit_parser.add_argument("-m", "--message", default="",
+            help="New message to replace the old.")
+    edit_parser.add_argument("-t", "--tag", default="",
+            help="Change issue tag")
+    edit_parser.add_argument("-c", "--close", action="store_true",
+            help="Close the issue"),
+    edit_parser.add_argument("-r", "--reopen", action="store_true",
+            help="Reopen a closed issue."),
+
+
     args = parser.parse_args()
 
     global issues
@@ -94,6 +120,8 @@ def main():
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
     elif args.subparser == "close":
         close_issue(args.number)
+    elif args.subparser == "edit":
+        edit_issue(args.number, args.message, args.tag, args.close, args.reopen)
     else:
         list_issues({"all": "", "closed": ""}, "")
 
