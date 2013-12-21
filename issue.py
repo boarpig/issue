@@ -95,7 +95,7 @@ def main():
     elif args.subparser == "close":
         close_issue(args.number)
     else:
-        parser.print_usage()
+        list_issues({"all": "", "closed": ""}, "")
 
 if __name__=='__main__':
     main()
