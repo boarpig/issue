@@ -7,7 +7,7 @@ from os.path import exists
 
 issues = []
 
-def new_issue(message, tag):
+def add_issue(message, tag):
     today = date.today().isoformat()
     largest = max([int(issue[1]) for issue in issues])
     number = largest + 1
@@ -64,11 +64,11 @@ def main():
     parser = argparse.ArgumentParser(description="Simple issue handler")
     subparsers = parser.add_subparsers(help="subcommand help", dest="subparser")
 
-    new_parser = subparsers.add_parser("new", help="Add new issue.")
-    new_parser.add_argument("-m", "--message", 
+    add_parser = subparsers.add_parser("add", help="Add new issue.")
+    add_parser.add_argument("-m", "--message", 
             help="""Message for the issue. if omitted, the $EDITOR will be
             invoked.""")
-    new_parser.add_argument("-t", "--tag", default="bug",
+    add_parser.add_argument("-t", "--tag", default="bug",
             help="Specify tag for issue, default: %(default)s")
 
     list_parser = subparsers.add_parser("list", help="List issues")
@@ -110,8 +110,8 @@ def main():
             exit()
 
 
-    if args.subparser == "new":
-        new_issue(args.message, args.tag)
+    if args.subparser == "add":
+        add_issue(args.message, args.tag)
     elif args.subparser == "list":
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
     elif args.subparser == "close":
