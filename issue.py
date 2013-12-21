@@ -34,13 +34,6 @@ def list_issues(flags, tag):
             print(col.ljust(lens[i] + 2, " "), end="")
         print()
 
-def close_issue(number):
-    global issues
-    for issue in issues:
-        if int(issue[1]) == number:
-            issue[0] = 'closed'
-    save_issues()
-
 def edit_issue(number, message, tag, close, reopen):
     global issues
     for issue in issues:
@@ -119,7 +112,7 @@ def main():
     elif args.subparser == "list":
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
     elif args.subparser == "close":
-        close_issue(args.number)
+        edit_issue(args.number, "", "", True, False)
     elif args.subparser == "edit":
         edit_issue(args.number, args.message, args.tag, args.close, args.reopen)
     else:
