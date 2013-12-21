@@ -49,6 +49,7 @@ def edit_issue(number, message, tag, close, reopen):
                 issue[0] = 'closed'
             if reopen:
                 issue[0] = 'open'
+            print('   '.join(issue))
     save_issues()
 
 def init():
