@@ -1,13 +1,36 @@
 #!/usr/bin/python
 
-import argparse
-import csv
 from datetime import date
 from os.path import exists
+import argparse
+import csv
+import os
+import subprocess
+import tempfile
 
 issues = []
 
+def open_editor(number=-1):
+    content = ""
+    if number != -1:
+        for issue in issues:
+            if int(issue[0]) == number:
+                content = issue[4]
+    with tempfile.NamedTemporaryFile() as f:
+        editor = os.environ['EDITOR']
+        filename = f.name
+        f.write(bytes(content, encoding="utf-8"))
+        ret = subprocess.call([editor, filename])
+        if ret == 0:
+            content = str(f.read(), encoding="utf-8")
+            content = content.replace("\n", " ").replace("\r", " ") \
+                .replace(",", " ")
+            repr(content)
+    return content
+
 def add_issue(message, tag):
+    if not message:
+        message = open_editor()
     today = date.today().isoformat()
     largest = max([int(issue[1]) for issue in issues])
     number = largest + 1
