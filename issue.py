@@ -41,7 +41,10 @@ def edit_issue(number, message, tag, close, reopen):
             if tag:
                 issue[3] = tag
             if message:
-                issue[4] = message
+                if issue[0] == 'closed':
+                    print("ERROR: Editing closed issue is disallowed.")
+                else:
+                    issue[4] = message
             if close:
                 issue[0] = 'closed'
             if reopen:
