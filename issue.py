@@ -130,6 +130,7 @@ def main():
     else:
         if args.subparser == "init":
             init()
+            exit()
         else:
             print("ISSUES file does not exist. You can create one with\n\n"
                     + " $ issue init\n")
