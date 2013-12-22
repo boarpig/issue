@@ -86,9 +86,13 @@ def init():
 
 def save_issues():
     global issues
-    with open("ISSUES", "w", newline='') as f:
-        writer = csv.writer(f)
-        writer.writerows(issues)
+    try:
+        with open("ISSUES", "w", newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(issues)
+    except PermissionError:
+        print("ERROR: No permission to write to the file. " 
+            + "Changes were not saved.")
 
 def main():
     parser = argparse.ArgumentParser(description="Simple issue handler")
@@ -129,8 +133,12 @@ def main():
 
     global issues
     if exists("ISSUES"):
-        with open("ISSUES") as f:
-            issues = list(csv.reader(f))
+        try:
+            with open("ISSUES") as f:
+                issues = list(csv.reader(f))
+        except PermissionError:
+            print("ERROR: No permissions to read ISSUES file")
+            exit()
     else:
         if args.subparser == "init":
             init()
