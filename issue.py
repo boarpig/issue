@@ -32,7 +32,9 @@ def add_issue(message, tag):
     if not message:
         message = open_editor()
     today = date.today().isoformat()
-    largest = max([int(issue[1]) for issue in issues])
+    largest = 0
+    if len(issues) < 0:
+        largest = max([int(issue[1]) for issue in issues])
     number = largest + 1
     issues.append(['open', number, tag, today, message])
     save_issues()
