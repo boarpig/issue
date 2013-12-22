@@ -64,6 +64,10 @@ def edit_issue(number, message="", tag="", close=False, reopen=False):
     for issue in issues:
         if int(issue[1]) == number:
             if tag:
+                if len(tag) > 20:
+                    tag = tag[:20]
+                    print("ERROR: tag length is over 20 characters. "
+                        + "Shortening it to 20 characters.")
                 issue[3] = tag
             if message:
                 if issue[0] == 'closed':
