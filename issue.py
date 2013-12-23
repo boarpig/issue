@@ -10,6 +10,11 @@ import tempfile
 
 issues = []
 
+def term_width():
+    # http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
+    rows, columns = os.popen('stty size', 'r').read().split()
+    return int(columns)
+
 def open_editor(number=-1):
     content = ""
     if number != -1:
@@ -60,13 +65,18 @@ def list_issues(flags, tag):
                 if len(issue[name]) > lens[name]:
                     lens[name] = len(issue[name])
     padding = 3
+    max_width = term_width()
+    desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
     for issue in issues:
         print(issue["status"].ljust(lens["status"] + padding), end='')
         print(str(issue["number"]).ljust(lens["number"] + padding), end='')
         print(issue["tag"].ljust(lens["tag"] + padding), end='')
         print(issue["date"].ljust(lens["date"] + padding), end='')
-        desc = issue["description"].ljust(lens["description"])
+        desc = issue["description"]
         desc = desc.splitlines()[0]
+        if len(desc) >= desc_width:
+            desc = desc[:desc_width - 3]
+            desc += "..."
         print(desc, end='')
         print()
 
