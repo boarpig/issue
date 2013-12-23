@@ -36,7 +36,7 @@ def add_issue(message, tag):
             exit(1)
     today = date.today().isoformat()
     largest = 0
-    if len(issues) < 0:
+    if len(issues) > 0:
         largest = max([int(issue[1]) for issue in issues])
     number = largest + 1
     issues.append(['open', number, tag, today, message])
