@@ -185,7 +185,11 @@ def main():
     if exists("ISSUES"):
         try:
             with open("ISSUES") as f:
-                issues = json.load(f)
+                try:
+                    issues = json.load(f)
+                except ValueError:
+                    print("ERROR: Error while loading json. "
+                            + "Maybe ISSUES file is corrupted.")
         except PermissionError:
             print("ERROR: No permissions to read ISSUES file")
             exit(1)
