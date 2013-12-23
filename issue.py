@@ -119,6 +119,16 @@ def init(force):
     else:
         open("ISSUES", "a").close()
 
+def show_issue(number):
+    for issue in issues:
+        if issue["number"] == number:
+            print("Status:\t" + issue["status"])
+            print("Number:\t" + str(number))
+            print("Tag:\t" + issue["tag"])
+            print("Date:\t" + issue["date"])
+            print("\n" + issue["description"] + "\n")
+            break
+
 def save_issues():
     global issues
     try:
@@ -139,6 +149,9 @@ def main():
             invoked.""")
     add_parser.add_argument("-t", "--tag", default="bug",
             help="Specify tag for issue, default: %(default)s")
+
+    show_parser = subparsers.add_parser("show", help="Show individual issue.")
+    show_parser.add_argument("number", type=int, help="Issue number to show")
 
     list_parser = subparsers.add_parser("list", help="List issues")
     list_parser.add_argument("-a", "--all", action="store_true", 
@@ -190,6 +203,8 @@ def main():
         init(args.force)
     elif args.subparser == "add":
         add_issue(args.message, args.tag)
+    elif args.subparser == "show":
+        show_issue(args.number)
     elif args.subparser == "list":
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
     elif args.subparser == "close":
