@@ -19,14 +19,16 @@ def open_editor(number=-1):
     content = ""
     if number != -1:
         for issue in issues:
-            if int(issue["status"]) == number:
+            if issue["number"] == number:
                 content = issue["description"]
     with tempfile.NamedTemporaryFile() as f:
         editor = os.environ['EDITOR']
         filename = f.name
         f.write(bytes(content, encoding="utf-8"))
+        f.flush()
         ret = subprocess.call([editor, filename])
         if ret == 0:
+            f.seek(0)
             content = str(f.read(), encoding="utf-8")
             content = content.strip("\n\r")
     return content
