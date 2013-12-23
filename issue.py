@@ -186,7 +186,9 @@ def main():
         try:
             with open("ISSUES") as f:
                 try:
-                    issues = json.load(f)
+                    content = f.read()
+                    if content.strip() != "":
+                        issues = json.loads(content)
                 except ValueError:
                     print("ERROR: Error while loading json. "
                             + "Maybe ISSUES file is corrupted.")
