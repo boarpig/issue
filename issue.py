@@ -31,6 +31,9 @@ def open_editor(number=-1):
 def add_issue(message, tag):
     if not message:
         message = open_editor()
+        if message.strip() == "":
+            print("Empty issue description. Aborting.")
+            exit(1)
     today = date.today().isoformat()
     largest = 0
     if len(issues) < 0:
