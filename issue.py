@@ -3,7 +3,7 @@
 from datetime import date
 from os.path import exists
 import argparse
-import csv
+import json
 import os
 import subprocess
 import tempfile
@@ -14,8 +14,8 @@ def open_editor(number=-1):
     content = ""
     if number != -1:
         for issue in issues:
-            if int(issue[0]) == number:
-                content = issue[4]
+            if int(issue["status"]) == number:
+                content = issue["description"]
     with tempfile.NamedTemporaryFile() as f:
         editor = os.environ['EDITOR']
         filename = f.name
@@ -23,9 +23,7 @@ def open_editor(number=-1):
         ret = subprocess.call([editor, filename])
         if ret == 0:
             content = str(f.read(), encoding="utf-8")
-            content = content.replace("\n", " ").replace("\r", " ") \
-                .replace(",", " ")
-            repr(content)
+            content = content.strip("\n\r")
     return content
 
 def add_issue(message, tag):
@@ -37,51 +35,65 @@ def add_issue(message, tag):
     today = date.today().isoformat()
     largest = 0
     if len(issues) > 0:
-        largest = max([int(issue[1]) for issue in issues])
+        largest = max([issue["number"] for issue in issues])
     number = largest + 1
-    issues.append(['open', number, tag, today, message])
+    issues.append({"status": "open", "number": number, "tag": tag, 
+        "date": today, "description": message})
     save_issues()
 
 def list_issues(flags, tag):
     global issues
     if not flags["all"]:
         if flags["closed"]:
-            issues = [issue for issue in issues if issue[0] == "closed"]
+            issues = [issue for issue in issues if issue["status"] == "closed"]
         else:
-            issues = [issue for issue in issues if issue[0] == "open"]
+            issues = [issue for issue in issues if issue["status"] == "open"]
     if tag:
-        issues = [issue for issue in issues if issue[2].lstrip() == tag]
-    cols = [["STATUS", "NUMBER", "TAG", "DATE", "DESCRIPTION"]]
-    lens = [0, 0, 0, 0, 0]
-    for issue in cols + issues:
-        for i, v in enumerate(issue):
-            if lens[i] < len(v):
-                lens[i] = len(v)
-    for issue in cols + issues:
-        for i, col in enumerate(issue):
-            print(col.ljust(lens[i] + 2, " "), end="")
+        issues = [issue for issue in issues if issue["tag"].lstrip() == tag]
+    lens = {"status": 0, "number": 0,"tag": 0, "date": 0, "description":0}
+    for issue in issues:
+        for name in lens:
+            if name == "number":
+                if len(str(issue[name])) > lens[name]:
+                    lens[name] = len(str(issue[name]))
+            else:
+                if len(issue[name]) > lens[name]:
+                    lens[name] = len(issue[name])
+    padding = 3
+    for issue in issues:
+        print(issue["status"].ljust(lens["status"] + padding), end='')
+        print(str(issue["number"]).ljust(lens["number"] + padding), end='')
+        print(issue["tag"].ljust(lens["tag"] + padding), end='')
+        print(issue["date"].ljust(lens["date"] + padding), end='')
+        print(issue["description"].ljust(lens["description"] + padding), end='')
         print()
 
 def edit_issue(number, message="", tag="", close=False, reopen=False):
     global issues
     for issue in issues:
-        if int(issue[1]) == number:
+        if issue["number"] == number:
             if tag:
                 if len(tag) > 20:
                     tag = tag[:20]
                     print("ERROR: tag length is over 20 characters. "
                         + "Shortening it to 20 characters.")
-                issue[3] = tag
+                issue["tag"] = tag
             if message:
-                if issue[0] == 'closed':
+                if issue["status"] == 'closed':
                     print("ERROR: Editing closed issue is disallowed.")
                 else:
-                    issue[4] = message
+                    issue["description"] = message
             if close:
-                issue[0] = 'closed'
+                issue["status"] = 'closed'
             if reopen:
-                issue[0] = 'open'
-            print('   '.join(issue))
+                issue["status"] = 'open'
+            order = ("status", "number", "tag", "date", "description")
+            for i in range(5):
+                if order[i] == "number":
+                    print(str(issue[order[i]]) + '   ', end='')
+                else:
+                    print(issue[order[i]] + '   ', end='')
+            print()
     save_issues()
 
 def init():
@@ -90,9 +102,9 @@ def init():
 def save_issues():
     global issues
     try:
-        with open("ISSUES", "w", newline='') as f:
-            writer = csv.writer(f)
-            writer.writerows(issues)
+        with open("ISSUES", "w") as f:
+            json.dump(issues, f, sort_keys=True, indent=4,
+                    separators=(",", ": "))
     except PermissionError:
         print("ERROR: No permission to write to the file. " 
             + "Changes were not saved.")
@@ -138,7 +150,7 @@ def main():
     if exists("ISSUES"):
         try:
             with open("ISSUES") as f:
-                issues = list(csv.reader(f))
+                issues = json.load(f)
         except PermissionError:
             print("ERROR: No permissions to read ISSUES file")
             exit(1)
