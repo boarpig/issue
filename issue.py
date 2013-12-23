@@ -65,7 +65,9 @@ def list_issues(flags, tag):
         print(str(issue["number"]).ljust(lens["number"] + padding), end='')
         print(issue["tag"].ljust(lens["tag"] + padding), end='')
         print(issue["date"].ljust(lens["date"] + padding), end='')
-        print(issue["description"].ljust(lens["description"] + padding), end='')
+        desc = issue["description"].ljust(lens["description"])
+        desc = desc.splitlines()[0]
+        print(desc, end='')
         print()
 
 def edit_issue(number, message="", tag="", close=False, reopen=False):
