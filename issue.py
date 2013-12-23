@@ -2,6 +2,7 @@
 
 from datetime import date, datetime
 from os.path import exists
+from string import whitespace
 import argparse
 import json
 import os
@@ -82,8 +83,12 @@ def list_issues(flags, tag):
         print(desc, end='')
         print()
 
-def edit_issue(number, message="", tag="", close=False, reopen=False):
+def edit_issue(number, message="", tag="", close=False, reopen=False, 
+            edit=False):
     global issues
+    if message and edit:
+        print("ERROR: Cannot use --message and --edit at the same time.")
+        exit(1)
     for issue in issues:
         if issue["number"] == number:
             if tag:
@@ -92,15 +97,24 @@ def edit_issue(number, message="", tag="", close=False, reopen=False):
                     print("ERROR: tag length is over 20 characters. "
                         + "Shortening it to 20 characters.")
                 issue["tag"] = tag
-            if message:
+            if message or edit:
                 if issue["status"] == 'closed':
                     print("ERROR: Editing closed issue is disallowed.")
-                else:
+                elif message:
                     issue["description"] = message
+                elif edit:
+                    new_desc = open_editor(number)
+                    if new_desc.strip("\n\r" + whitespace) == "":
+                        print("Got empty issue description. " 
+                                + "Issue left unchanged.")
+                        exit(0)
+                    else:
+                        issue["description"] = new_desc
             if close:
                 issue["status"] = 'closed'
             if reopen:
                 issue["status"] = 'open'
+
             show_issue(number)
             break
     save_issues()
@@ -184,7 +198,8 @@ def main():
             help="Close the issue"),
     edit_parser.add_argument("-r", "--reopen", action="store_true",
             help="Reopen a closed issue."),
-
+    edit_parser.add_argument("-e", "--edit", action="store_true",
+            help="Edit issue in editor."),
 
     args = parser.parse_args()
 
@@ -223,7 +238,8 @@ def main():
     elif args.subparser == "close":
         edit_issue(args.number, close=True)
     elif args.subparser == "edit":
-        edit_issue(args.number, args.message, args.tag, args.close, args.reopen)
+        edit_issue(args.number, args.message, args.tag, args.close,
+                args.reopen, args.edit)
     else:
         list_issues({"all": "", "closed": ""}, "")
 
