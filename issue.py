@@ -141,15 +141,15 @@ def main():
                 issues = list(csv.reader(f))
         except PermissionError:
             print("ERROR: No permissions to read ISSUES file")
-            exit()
+            exit(1)
     else:
         if args.subparser == "init":
             init()
-            exit()
+            exit(0)
         else:
             print("ISSUES file does not exist. You can create one with\n\n"
                     + " $ issue init\n")
-            exit()
+            exit(1)
 
 
     if args.subparser == "add":
