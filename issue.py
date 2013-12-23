@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from datetime import date
+from datetime import date, datetime
 from os.path import exists
 import argparse
 import json
@@ -98,8 +98,26 @@ def edit_issue(number, message="", tag="", close=False, reopen=False):
             print()
     save_issues()
 
-def init():
-    open("ISSUES", "a").close()
+def init(force):
+    if exists("ISSUES"):
+        if force:
+            now = datetime.today().strftime("%Y-%m-%d_%H%M%S")
+            newfile = "ISSUES_" + now
+            if exists(newfile):
+                print("ERROR: Could not rename old file. Filename already" 
+                        + " exists.")
+                exit(1)
+            else:
+                try:
+                    os.rename("ISSUES", newfile)
+                except OSError:
+                    print("ERROR: could not rename file.")
+            open("ISSUES", "a").close()
+        else:
+            print("ERROR: ISSUES file already exists. Use --force to "
+                    + "remove it and make new.")
+    else:
+        open("ISSUES", "a").close()
 
 def save_issues():
     global issues
@@ -133,6 +151,8 @@ def main():
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
     init_parser = subparsers.add_parser("init", help="Initialize issue file")
+    init_parser.add_argument("-f", "--force", action="store_true", 
+            help="Make issue files regardless if one exists already.")
 
     edit_parser = subparsers.add_parser("edit", help="Edit issue.")
     edit_parser.add_argument("number", type=int, help="Issue number to edit")
@@ -158,7 +178,7 @@ def main():
             exit(1)
     else:
         if args.subparser == "init":
-            init()
+            init(args.force)
             exit(0)
         else:
             print("ISSUES file does not exist. You can create one with\n\n"
@@ -166,7 +186,9 @@ def main():
             exit(1)
 
 
-    if args.subparser == "add":
+    if args.subparser == "init":
+        init(args.force)
+    elif args.subparser == "add":
         add_issue(args.message, args.tag)
     elif args.subparser == "list":
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
