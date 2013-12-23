@@ -89,13 +89,8 @@ def edit_issue(number, message="", tag="", close=False, reopen=False):
                 issue["status"] = 'closed'
             if reopen:
                 issue["status"] = 'open'
-            order = ("status", "number", "tag", "date", "description")
-            for i in range(5):
-                if order[i] == "number":
-                    print(str(issue[order[i]]) + '   ', end='')
-                else:
-                    print(issue[order[i]] + '   ', end='')
-            print()
+            show_issue(number)
+            break
     save_issues()
 
 def init(force):
