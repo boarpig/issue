@@ -5,11 +5,13 @@ from os.path import exists
 from string import whitespace
 import argparse
 import json
+import logging
 import os
 import subprocess
 import tempfile
 
 issues = []
+logging.basicConfig(format='%(levelname)s:%(message)s')
 
 def term_width():
     # http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
@@ -87,19 +89,19 @@ def edit_issue(number, message="", tag="", close=False, reopen=False,
             edit=False):
     global issues
     if message and edit:
-        print("ERROR: Cannot use --message and --edit at the same time.")
+        logging.warning("Cannot use --message and --edit at the same time.")
         exit(1)
     for issue in issues:
         if issue["number"] == number:
             if tag:
                 if len(tag) > 20:
                     tag = tag[:20]
-                    print("ERROR: tag length is over 20 characters. "
+                    logging.warning("Tag length is over 20 characters. "
                         + "Shortening it to 20 characters.")
                 issue["tag"] = tag
             if message or edit:
                 if issue["status"] == 'closed':
-                    print("ERROR: Editing closed issue is disallowed.")
+                    logging.warning("Editing closed issue is disallowed.")
                 elif message:
                     issue["description"] = message
                 elif edit:
@@ -125,18 +127,18 @@ def init(force):
             now = datetime.today().strftime("%Y-%m-%d_%H%M%S")
             newfile = "ISSUES_" + now
             if exists(newfile):
-                print("ERROR: Could not rename old file. Filename already" 
+                logging.error("Could not rename old file. Filename already" 
                         + " exists.")
                 exit(1)
             else:
                 try:
                     os.rename("ISSUES", newfile)
                 except OSError:
-                    print("ERROR: could not rename file.")
+                    logging.error("Could not rename file.")
             open("ISSUES", "a").close()
         else:
-            print("ERROR: ISSUES file already exists. Use --force to "
-                    + "remove it and make new.")
+            logging.error("ISSUES file already exists.")
+            print("Use --force to remove it and make new.")
     else:
         open("ISSUES", "a").close()
 
@@ -157,7 +159,7 @@ def save_issues():
             json.dump(issues, f, sort_keys=True, indent=4,
                     separators=(",", ": "))
     except PermissionError:
-        print("ERROR: No permission to write to the file. " 
+        logging.error("No permission to write to the file. " 
             + "Changes were not saved.")
 
 def main():
@@ -212,18 +214,18 @@ def main():
                     if content.strip() != "":
                         issues = json.loads(content)
                 except ValueError:
-                    print("ERROR: Error while loading json. "
+                    logging.error("Error while loading json. "
                             + "Maybe ISSUES file is corrupted.")
         except PermissionError:
-            print("ERROR: No permissions to read ISSUES file")
+            logging.error("No permissions to read ISSUES file")
             exit(1)
     else:
         if args.subparser == "init":
             init(args.force)
             exit(0)
         else:
-            print("ISSUES file does not exist. You can create one with\n\n"
-                    + " $ issue init\n")
+            logging.warning("ISSUES file does not exist.")
+            print("You can create one with\n\n $ issue init\n")
             exit(1)
 
 
