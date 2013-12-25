@@ -69,21 +69,8 @@ def list_issues(flags, tag):
             else:
                 if len(issue[name]) > lens[name]:
                     lens[name] = len(issue[name])
-    padding = 3
-    max_width = term_width()
-    desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
     for issue in issues:
-        print(issue["status"].ljust(lens["status"] + padding), end='')
-        print(str(issue["number"]).ljust(lens["number"] + padding), end='')
-        print(issue["tag"].ljust(lens["tag"] + padding), end='')
-        print(issue["date"].ljust(lens["date"] + padding), end='')
-        desc = issue["description"]
-        desc = desc.splitlines()[0]
-        if len(desc) >= desc_width:
-            desc = desc[:desc_width - 3]
-            desc += "..."
-        print(desc, end='')
-        print()
+        print_short(issue, lens)
 
 def edit_issue(number, message="", tag="", close=False, reopen=False, 
             edit=False):
@@ -116,8 +103,7 @@ def edit_issue(number, message="", tag="", close=False, reopen=False,
                 issue["status"] = 'closed'
             if reopen:
                 issue["status"] = 'open'
-
-            show_issue(number)
+            print_short(issue)
             break
     save_issues()
 
@@ -142,7 +128,29 @@ def init(force):
     else:
         open("ISSUES", "a").close()
 
-def show_issue(number):
+def print_short(issue, lengths={}):
+    if not lengths:
+        for col in issue:
+            if col == "number":
+                lengths[col] = len(str(issue[col]))
+            else:
+                lengths[col] = len(issue[col])
+    padding = 3
+    max_width = term_width()
+    desc_width = max_width - (sum(lengths.values()) - lengths["description"]) - 12
+    print(issue["status"].ljust(lengths["status"] + padding), end='')
+    print(str(issue["number"]).ljust(lengths["number"] + padding), end='')
+    print(issue["tag"].ljust(lengths["tag"] + padding), end='')
+    print(issue["date"].ljust(lengths["date"] + padding), end='')
+    desc = issue["description"]
+    desc = desc.splitlines()[0]
+    if len(desc) >= desc_width:
+        desc = desc[:desc_width - 3]
+        desc += "..."
+    print(desc, end='')
+    print()
+
+def print_long(number):
     for issue in issues:
         if issue["number"] == number:
             print("Status:\t" + issue["status"])
@@ -234,7 +242,7 @@ def main():
     elif args.subparser == "add":
         add_issue(args.message, args.tag)
     elif args.subparser == "show":
-        show_issue(args.number)
+        print_long(args.number)
     elif args.subparser == "list":
         list_issues({"all": args.all, "closed": args.closed}, args.tag)
     elif args.subparser == "close":
