@@ -51,6 +51,7 @@ def add_issue(message, tag):
             "description": message}
     issues.append(issue)
     print_short([issue])
+    logging.info("Added a new issue:\n{}".format(issue))
     save_issues()
 
 def search_issues(status="open", tag="", description=""):
@@ -109,15 +110,18 @@ def init(force):
             else:
                 try:
                     os.rename("ISSUES", newfile)
+                    logging.info("Moved old issue file to {}".format(newfile))
                 except OSError:
                     logging.error("Could not rename file.")
             global issues
             issues = []
             save_issues()
+            logging.info("Created a new issue file.")
         else:
             logging.error("ISSUES file already exists.")
             print("Use --force to make one anyway.")
     else:
+        logging.info("Created a new issue file.")
         save_issues()
 
 def print_short(issuelist):
@@ -175,6 +179,7 @@ def save_issues():
     except PermissionError:
         logging.error("No permission to write to the file. " 
             + "Changes were not saved.")
+    logging.info("Succesfully saved issues")
 
 def remove_issue(number):
     global issues
