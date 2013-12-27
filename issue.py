@@ -176,6 +176,25 @@ def save_issues():
         logging.error("No permission to write to the file. " 
             + "Changes were not saved.")
 
+def remove_issue(number):
+    global issues
+    print("Warning! You are about to remove following issue. "
+            + "This cannot be undone!")
+    print_long(number)
+    print("To confirm, please retype the issue number: ", end="")
+    other = input()
+    if other.isdigit():
+        other = int(other)
+    else:
+        logging.error("Not a number. Aborting.")
+        exit(1)
+    if number == int(other):
+        issues = [issue for issue in issues if issue["number"] != number]
+        save_issues()
+        logging.info("Removed an issue.")
+    else:
+        logging.error("Wrong issue number. Aborting.")
+
 def main():
     parser = argparse.ArgumentParser(description="Simple issue handler")
     subparsers = parser.add_subparsers(title="subcommands", dest="subparser")
@@ -218,6 +237,11 @@ def main():
     init_parser.add_argument("-f", "--force", action="store_true", 
             help="Make issue files regardless if one exists already.")
 
+    remove_parser = subparsers.add_parser("remove", aliases=["rm"],
+            help="Remove an issue")
+    remove_parser.add_argument("number", type=int,
+        help="Number of the issue you want to remove")
+
     args = parser.parse_args()
 
     global issues
@@ -257,6 +281,8 @@ def main():
     elif args.subparser == "edit":
         edit_issue(args.number, message=args.message, tag=args.tag, 
                 status=args.status, edit=args.edit)
+    elif args.subparser == "remove" or args.subparser == "rm":
+        remove_issue(args.number)
     else:
         search_issues()
 
