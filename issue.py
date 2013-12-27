@@ -63,8 +63,7 @@ def search_issues(status="open", tag="", description=""):
                 issue["description"].find(description)]
     print_short(issues)
 
-def edit_issue(number, message="", tag="", close=False, reopen=False, 
-            edit=False):
+def edit_issue(number, message="", tag="", status="", edit=False):
     global issues
     if message and edit:
         logging.warning("Cannot use --message and --edit at the same time.")
@@ -248,10 +247,10 @@ def main():
     elif args.subparser == "search":
         search_issues(args.status, args.tag, args.description)
     elif args.subparser == "close":
-        edit_issue(args.number, close=True)
+        edit_issue(args.number, status="closed")
     elif args.subparser == "edit":
-        edit_issue(args.number, args.message, args.tag, args.close,
-                args.reopen, args.edit)
+        edit_issue(args.number, message=args.message, tag=args.tag, 
+                status=args.status, edit=args.edit)
     else:
         search_issues()
 
