@@ -90,10 +90,8 @@ def edit_issue(number, message="", tag="", close=False, reopen=False,
                         exit(0)
                     else:
                         issue["description"] = new_desc
-            if close:
-                issue["status"] = 'closed'
-            if reopen:
-                issue["status"] = 'open'
+            if status:
+                issue["status"] = status
             print_short((issue,))
             break
     save_issues()
@@ -211,10 +209,8 @@ def main():
             help="New message to replace the old.")
     edit_parser.add_argument("-t", "--tag", default="",
             help="Change issue tag")
-    edit_parser.add_argument("-c", "--close", action="store_true",
-            help="Close the issue"),
-    edit_parser.add_argument("-r", "--reopen", action="store_true",
-            help="Reopen a closed issue."),
+    edit_parser.add_argument("-s", "--status", default="",
+            help="Change issue status")
     edit_parser.add_argument("-e", "--edit", action="store_true",
             help="Edit issue in editor."),
 
