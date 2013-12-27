@@ -51,15 +51,16 @@ def add_issue(message, tag):
         "date": today, "description": message})
     save_issues()
 
-def list_issues(flags, tag):
+def search_issues(status="open", tag="", description=""):
     global issues
-    if not flags["all"]:
-        if flags["closed"]:
-            issues = [issue for issue in issues if issue["status"] == "closed"]
-        else:
-            issues = [issue for issue in issues if issue["status"] == "open"]
+    if status and status != "all":
+        issues = [issue for issue in issues if issue["status"] == status]
     if tag:
         issues = [issue for issue in issues if issue["tag"].lstrip() == tag]
+    if description:
+        description = description.lower()
+        issues = [issue for issue in issues if
+                issue["description"].find(description)]
     print_short(issues)
 
 def edit_issue(number, message="", tag="", close=False, reopen=False, 
@@ -189,12 +190,13 @@ def main():
     show_parser = subparsers.add_parser("show", help="Show individual issue.")
     show_parser.add_argument("number", type=int, help="Issue number to show")
 
-    list_parser = subparsers.add_parser("list", help="List issues")
-    list_parser.add_argument("-a", "--all", action="store_true", 
-            default=False, help="List all issues instead of open ones.")
-    list_parser.add_argument("-c", "--closed", action="store_true", 
-            default=False, help="List closed issues.")
-    list_parser.add_argument("-t", "--tag", help="List only specified tag")
+    search_parser = subparsers.add_parser("search", help="search issues")
+    search_parser.add_argument("-s", "--status", default="open", 
+            help="Filter issues by status. default: %(default)s")
+    search_parser.add_argument("-t", "--tag", 
+            help="Filter issues by tag.")
+    search_parser.add_argument("-d", "--description", 
+            help="Filter issues by description.")
 
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
@@ -248,15 +250,15 @@ def main():
         add_issue(args.message, args.tag)
     elif args.subparser == "show":
         print_long(args.number)
-    elif args.subparser == "list":
-        list_issues({"all": args.all, "closed": args.closed}, args.tag)
+    elif args.subparser == "search":
+        search_issues(args.status, args.tag, args.description)
     elif args.subparser == "close":
         edit_issue(args.number, close=True)
     elif args.subparser == "edit":
         edit_issue(args.number, args.message, args.tag, args.close,
                 args.reopen, args.edit)
     else:
-        list_issues({"all": "", "closed": ""}, "")
+        search_issues()
 
 if __name__=='__main__':
     main()
