@@ -201,11 +201,11 @@ def main():
 
     search_parser = subparsers.add_parser("search", help="Search issues")
     search_parser.add_argument("-s", "--status", default="open", 
-            help="Filter issues by status. 'all' will list all issue."
+            help="Filter issues by status. 'all' will list all issues."
             + " default: %(default)s")
     search_parser.add_argument("-t", "--tag", 
             help="Filter issues by tag.")
-    search_parser.add_argument("-d", "--description", 
+    search_parser.add_argument("-d", "--description", metavar="TEXT",
             help="Filter issues by description.")
 
     show_parser = subparsers.add_parser("show", 
@@ -249,7 +249,8 @@ def main():
     elif args.subparser == "show":
         print_long(args.number)
     elif args.subparser == "search":
-        search_issues(args.status, args.tag, args.description)
+        search_issues(status=args.status, tag=args.tag,
+                description=args.description)
     elif args.subparser == "close":
         edit_issue(args.number, status="closed")
     elif args.subparser == "edit":
