@@ -74,11 +74,29 @@ def edit_issue(number, message="", tag="", status="", edit=False):
     for issue in issues:
         if issue["number"] == number:
             if tag:
-                if len(tag) > 20:
-                    tag = tag[:20]
-                    logging.warning("Tag length is over 20 characters. "
-                        + "Shortening it to 20 characters.")
-                issue["tag"] = tag
+                if tag[0] == '+':
+                    for each in tag[1:].split(","):
+                        if len(each) > 20:
+                            each = each[:20]
+                            logging.warning("Tag length is over 20 characters. "
+                                + "Shortening it to 20 characters.")
+                        issue["tag"] += "," + each
+                elif tag[0] == '-':
+                    removes = tag[1:].split(",")
+                    current = issue["tag"].split(",")
+                    issue["tag"] = ""
+                    for part in current:
+                        if part not in removes:
+                            issue["tag"] += "," + part
+                elif tag[0] == '=':
+                    for each in tag[1:].split(","):
+                        issue["tag"] = ""
+                        if len(each) > 20:
+                            each = each[:20]
+                            logging.warning("Tag length is over 20 characters. "
+                                + "Shortening it to 20 characters.")
+                        issue["tag"] += "," + each
+                issue["tag"] = issue["tag"].lstrip(",")
             if message or edit:
                 if issue["status"] == 'closed':
                     logging.warning("Editing closed issue is disallowed.")
