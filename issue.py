@@ -38,10 +38,10 @@ def open_editor(number=-1):
             content = content.strip("\n\r")
     return content
 
-def add_issue(message, tag):
-    if not message:
-        message = open_editor()
-        if message.strip() == "":
+def add_issue(description, tag):
+    if not description:
+        description = open_editor()
+        if description.strip() == "":
             print("Empty issue description. Aborting.")
             exit(1)
     today = date.today().isoformat()
@@ -50,7 +50,7 @@ def add_issue(message, tag):
         largest = max([issue["number"] for issue in issues])
     number = largest + 1
     issue = {"status": "open", "number": number, "tag": tag, "date": today, 
-            "description": message}
+            "description": description}
     issues.append(issue)
     print_short([issue])
     logging.info("Added a new issue:\n{}".format(issue))
@@ -245,9 +245,9 @@ def main():
     subparsers = parser.add_subparsers(title="subcommands", dest="subparser")
 
     add_parser = subparsers.add_parser("add", help="Add new issue")
-    add_parser.add_argument("-m", "--message", 
-            help="""Message for the issue. if omitted, the $EDITOR will be
-            invoked.""")
+    add_parser.add_argument("-d", "--description", metavar="TEXT",
+            help="Description of the issue. if omitted, "
+                + "the $EDITOR will be invoked.")
     add_parser.add_argument("-t", "--tag", default="bug",
             help="Specify tag for issue, default: %(default)s")
 
@@ -337,7 +337,7 @@ def main():
     if args.subparser == "init":
         init(args.force, args.gzip)
     elif args.subparser == "add":
-        add_issue(args.message, args.tag)
+        add_issue(args.description, args.tag)
     elif args.subparser == "show":
         print_long(args.number)
     elif args.subparser == "search" or args.subparser == "se":
