@@ -118,18 +118,27 @@ def edit_issue(number, message="", tag="", status="", edit=False):
             break
     save_issues()
 
-def init(force):
-    if exists("ISSUES"):
+def init(force, compress):
+    if compress:
+        global gzip_file
+        gzip_file = True
+    if exists("ISSUES") or exists("ISSUES.gz"):
         if force:
             now = datetime.today().strftime("%Y-%m-%d_%H%M%S")
-            newfile = "ISSUES_" + now
+            if gzip_file:
+                newfile = "ISSUES.gz_" + now
+            else:
+                newfile = "ISSUES_" + now
             if exists(newfile):
                 logging.error("Could not rename old file. Filename already" 
                         + " exists.")
                 exit(1)
             else:
                 try:
-                    os.rename("ISSUES", newfile)
+                    if gzip_file:
+                        os.rename("ISSUES.gz", newfile)
+                    else:
+                        os.rename("ISSUES", newfile)
                     logging.info("Moved old issue file to {}".format(newfile))
                 except OSError:
                     logging.error("Could not rename file.")
@@ -270,6 +279,8 @@ def main():
     init_parser = subparsers.add_parser("init", help="Initialize issue file")
     init_parser.add_argument("-f", "--force", action="store_true", 
             help="Make issue files regardless if one exists already.")
+    init_parser.add_argument("-g", "--gzip", action="store_true", 
+            help="Make gzip compressed issue file.")
 
     remove_parser = subparsers.add_parser("remove", aliases=["rm"],
             help="Remove an issue")
@@ -311,10 +322,9 @@ def main():
         except PermissionError:
             logging.error("No permissions to read ISSUES file")
             exit(1)
-
     else:
         if args.subparser == "init":
-            init(args.force)
+            init(args.force, args.gzip)
             exit(0)
         else:
             logging.warning("ISSUES file does not exist.")
@@ -322,7 +332,7 @@ def main():
             exit(1)
 
     if args.subparser == "init":
-        init(args.force)
+        init(args.force, args.gzip)
     elif args.subparser == "add":
         add_issue(args.message, args.tag)
     elif args.subparser == "show":
