@@ -38,7 +38,7 @@ def open_editor(number=-1):
             content = content.strip("\n\r")
     return content
 
-def add_issue(description, tag):
+def add_issue(description, tags):
     if not description:
         description = open_editor()
         if description.strip() == "":
@@ -49,55 +49,60 @@ def add_issue(description, tag):
     if len(issues) > 0:
         largest = max([issue["number"] for issue in issues])
     number = largest + 1
-    issue = {"status": "open", "number": number, "tag": tag, "date": today, 
+    issue = {"status": "open", "number": number, "tag": tags, "date": today, 
             "description": description}
     issues.append(issue)
     print_short([issue])
     logging.info("Added a new issue:\n{}".format(issue))
     save_issues()
 
-def search_issues(status="open", tag="", description=""):
+def search_issues(status="open", tags="", description=""):
     global issues
     if status and status != "all":
         issues = [issue for issue in issues if issue["status"] == status]
-    if tag:
-        issues = [issue for issue in issues if issue["tag"].lstrip() == tag]
+    if tags:
+        for tag in tags.split(","):
+            issues = [issue for issue in issues 
+                    if issue["tag"].lstrip().find(tag) != -1]
     if description:
         description = description.lower()
         issues = [issue for issue in issues if
                 issue["description"].find(description)]
-    print_short(issues)
+    if issues:
+        print_short(issues)
+    else:
+        print("Nothing found.")
 
-def edit_issue(number, message="", tag="", status="", edit=False):
+def edit_issue(number, message="", tags="", status="", edit=False):
     global issues
     if message and edit:
         logging.warning("Cannot use --message and --edit at the same time.")
         exit(1)
     for issue in issues:
         if issue["number"] == number:
-            if tag:
-                if tag[0] == '+':
-                    for each in tag[1:].split(","):
-                        if len(each) > 20:
-                            each = each[:20]
+            if tags:
+                if tags[0] == '+':
+                    for tag in tags[1:].split(","):
+                        if len(tag) > 20:
+                            tag = tag[:20]
                             logging.warning("Tag length is over 20 characters. "
                                 + "Shortening it to 20 characters.")
-                        issue["tag"] += "," + each
-                elif tag[0] == '-':
-                    removes = tag[1:].split(",")
-                    current = issue["tag"].split(",")
+                        issue["tag"] += "," + tag
+                elif tags[0] == '-':
+                    removes = tags[1:].split(",")
+                    current_tags = issue["tag"].split(",")
                     issue["tag"] = ""
-                    for part in current:
-                        if part not in removes:
-                            issue["tag"] += "," + part
-                elif tag[0] == '=':
-                    for each in tag[1:].split(","):
+                    for tag in current_tags:
+                        if tag not in removes:
+                            issue["tag"] += "," + tag
+                elif tags[0] == '=':
+                    for tag in tags[1:].split(","):
                         issue["tag"] = ""
-                        if len(each) > 20:
-                            each = each[:20]
+                        if len(tag) > 20:
+                            tag = tag[:20]
                             logging.warning("Tag length is over 20 characters. "
                                 + "Shortening it to 20 characters.")
-                        issue["tag"] += "," + each
+                        issue["tag"] += "," + tag
                 issue["tag"] = issue["tag"].lstrip(",")
             if message or edit:
                 if issue["status"] == 'closed':
@@ -248,15 +253,15 @@ def main():
     add_parser.add_argument("-d", "--description", metavar="TEXT",
             help="Description of the issue. if omitted, "
                 + "the $EDITOR will be invoked.")
-    add_parser.add_argument("-t", "--tag", default="bug",
-            help="Specify tag for issue, default: %(default)s")
+    add_parser.add_argument("-t", "--tags", default="bug",
+            help="Specify tags for issue, default: %(default)s")
 
     edit_parser = subparsers.add_parser("edit", help="Edit individual issue")
     edit_parser.add_argument("number", type=int, help="Issue number to edit")
     edit_parser.add_argument("-m", "--message", default="",
             help="New message to replace the old.")
-    edit_parser.add_argument("-t", "--tag", default="",
-            help="Change issue tag")
+    edit_parser.add_argument("-t", "--tags", default="",
+            help="Change issue tags")
     edit_parser.add_argument("-s", "--status", default="",
             help="Change issue status")
     edit_parser.add_argument("-e", "--edit", action="store_true",
@@ -270,8 +275,8 @@ def main():
     search_parser.add_argument("-s", "--status", default="open", 
             help="Filter issues by status. 'all' will list all issues."
             + " default: %(default)s")
-    search_parser.add_argument("-t", "--tag", 
-            help="Filter issues by tag.")
+    search_parser.add_argument("-t", "--tags", 
+            help="Filter issues by tags.")
     search_parser.add_argument("-d", "--description", metavar="TEXT",
             help="Filter issues by description.")
 
@@ -337,16 +342,16 @@ def main():
     if args.subparser == "init":
         init(args.force, args.gzip)
     elif args.subparser == "add":
-        add_issue(args.description, args.tag)
+        add_issue(args.description, args.tags)
     elif args.subparser == "show":
         print_long(args.number)
     elif args.subparser == "search" or args.subparser == "se":
-        search_issues(status=args.status, tag=args.tag,
+        search_issues(status=args.status, tags=args.tags,
                 description=args.description)
     elif args.subparser == "close":
         edit_issue(args.number, status="closed")
     elif args.subparser == "edit":
-        edit_issue(args.number, message=args.message, tag=args.tag, 
+        edit_issue(args.number, message=args.message, tags=args.tags, 
                 status=args.status, edit=args.edit)
     elif args.subparser == "remove" or args.subparser == "rm":
         remove_issue(args.number)
