@@ -185,25 +185,6 @@ def main():
     add_parser.add_argument("-t", "--tag", default="bug",
             help="Specify tag for issue, default: %(default)s")
 
-    show_parser = subparsers.add_parser("show", help="Show individual issue.")
-    show_parser.add_argument("number", type=int, help="Issue number to show")
-
-    search_parser = subparsers.add_parser("search", help="search issues")
-    search_parser.add_argument("-s", "--status", default="open", 
-            help="Filter issues by status. 'all' will list all issue."
-            + " default: %(default)s")
-    search_parser.add_argument("-t", "--tag", 
-            help="Filter issues by tag.")
-    search_parser.add_argument("-d", "--description", 
-            help="Filter issues by description.")
-
-    close_parser = subparsers.add_parser("close", help="Close an issue")
-    close_parser.add_argument("number", type=int, help="Issue number to close")
-
-    init_parser = subparsers.add_parser("init", help="Initialize issue file")
-    init_parser.add_argument("-f", "--force", action="store_true", 
-            help="Make issue files regardless if one exists already.")
-
     edit_parser = subparsers.add_parser("edit", help="Edit issue.")
     edit_parser.add_argument("number", type=int, help="Issue number to edit")
     edit_parser.add_argument("-m", "--message", default="",
@@ -214,6 +195,25 @@ def main():
             help="Change issue status")
     edit_parser.add_argument("-e", "--edit", action="store_true",
             help="Edit issue in editor."),
+
+    close_parser = subparsers.add_parser("close", help="Close an issue")
+    close_parser.add_argument("number", type=int, help="Issue number to close")
+
+    search_parser = subparsers.add_parser("search", help="search issues")
+    search_parser.add_argument("-s", "--status", default="open", 
+            help="Filter issues by status. 'all' will list all issue."
+            + " default: %(default)s")
+    search_parser.add_argument("-t", "--tag", 
+            help="Filter issues by tag.")
+    search_parser.add_argument("-d", "--description", 
+            help="Filter issues by description.")
+
+    show_parser = subparsers.add_parser("show", help="Show individual issue.")
+    show_parser.add_argument("number", type=int, help="Issue number to show")
+
+    init_parser = subparsers.add_parser("init", help="Initialize issue file")
+    init_parser.add_argument("-f", "--force", action="store_true", 
+            help="Make issue files regardless if one exists already.")
 
     args = parser.parse_args()
 
