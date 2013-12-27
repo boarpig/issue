@@ -199,7 +199,7 @@ def main():
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
-    search_parser = subparsers.add_parser("search", help="Search issues")
+    search_parser = subparsers.add_parser("search", aliases=["se"], help="Search issues")
     search_parser.add_argument("-s", "--status", default="open", 
             help="Filter issues by status. 'all' will list all issues."
             + " default: %(default)s")
@@ -241,14 +241,13 @@ def main():
             print("You can create one with\n\n $ issue init\n")
             exit(1)
 
-
     if args.subparser == "init":
         init(args.force)
     elif args.subparser == "add":
         add_issue(args.message, args.tag)
     elif args.subparser == "show":
         print_long(args.number)
-    elif args.subparser == "search":
+    elif args.subparser == "search" or args.subparser == "se":
         search_issues(status=args.status, tag=args.tag,
                 description=args.description)
     elif args.subparser == "close":
