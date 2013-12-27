@@ -110,12 +110,12 @@ def init(force):
                     os.rename("ISSUES", newfile)
                 except OSError:
                     logging.error("Could not rename file.")
-            open("ISSUES", "a").close()
+            open("ISSUES", "x").close()
         else:
             logging.error("ISSUES file already exists.")
-            print("Use --force to remove it and make new.")
+            print("Use --force to make one anyway.")
     else:
-        open("ISSUES", "a").close()
+        open("ISSUES", "x").close()
 
 def print_short(issuelist):
     lens = {"status": 0, "number": 0,"tag": 0, "date": 0, "description":0}
