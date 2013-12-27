@@ -188,7 +188,8 @@ def main():
 
     search_parser = subparsers.add_parser("search", help="search issues")
     search_parser.add_argument("-s", "--status", default="open", 
-            help="Filter issues by status. default: %(default)s")
+            help="Filter issues by status. 'all' will list all issue."
+            + " default: %(default)s")
     search_parser.add_argument("-t", "--tag", 
             help="Filter issues by tag.")
     search_parser.add_argument("-d", "--description", 
