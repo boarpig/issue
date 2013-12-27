@@ -60,17 +60,7 @@ def list_issues(flags, tag):
             issues = [issue for issue in issues if issue["status"] == "open"]
     if tag:
         issues = [issue for issue in issues if issue["tag"].lstrip() == tag]
-    lens = {"status": 0, "number": 0,"tag": 0, "date": 0, "description":0}
-    for issue in issues:
-        for name in lens:
-            if name == "number":
-                if len(str(issue[name])) > lens[name]:
-                    lens[name] = len(str(issue[name]))
-            else:
-                if len(issue[name]) > lens[name]:
-                    lens[name] = len(issue[name])
-    for issue in issues:
-        print_short(issue, lens)
+    print_short(issues)
 
 def edit_issue(number, message="", tag="", close=False, reopen=False, 
             edit=False):
@@ -103,7 +93,7 @@ def edit_issue(number, message="", tag="", close=False, reopen=False,
                 issue["status"] = 'closed'
             if reopen:
                 issue["status"] = 'open'
-            print_short(issue)
+            print_short((issue,))
             break
     save_issues()
 
@@ -128,27 +118,42 @@ def init(force):
     else:
         open("ISSUES", "a").close()
 
-def print_short(issue, lengths={}):
-    if not lengths:
+def print_short(issuelist):
+    lens = {"status": 0, "number": 0,"tag": 0, "date": 0, "description":0}
+    if len(issuelist) > 1:
+        for issue in issuelist:
+            for col in issue:
+                if col == "number":
+                    if len(str(issue[col])) > lens[col]:
+                        lens[col] = len(str(issue[col]))
+                else:
+                    if len(issue[col]) > lens[col]:
+                        lens[col] = len(issue[col])
+    elif len(issuelist) == 1:
+        issue = issuelist[0]
         for col in issue:
-            if col == "number":
-                lengths[col] = len(str(issue[col]))
-            else:
-                lengths[col] = len(issue[col])
-    padding = 3
-    max_width = term_width()
-    desc_width = max_width - (sum(lengths.values()) - lengths["description"]) - 12
-    print(issue["status"].ljust(lengths["status"] + padding), end='')
-    print(str(issue["number"]).ljust(lengths["number"] + padding), end='')
-    print(issue["tag"].ljust(lengths["tag"] + padding), end='')
-    print(issue["date"].ljust(lengths["date"] + padding), end='')
-    desc = issue["description"]
-    desc = desc.splitlines()[0]
-    if len(desc) >= desc_width:
-        desc = desc[:desc_width - 3]
-        desc += "..."
-    print(desc, end='')
-    print()
+            if col == "number" and len(str(issue[col])) > lens[col]:
+                lens[col] = len(str(issue[col]))
+            elif col != "number" and len(issue[col]) > lens[col]:
+                lens[col] = len(issue[col])
+    else:
+        logging.warning("Issue list print requested but got nothing.")
+        exit(1)
+    for issue in issuelist:
+        padding = 3
+        max_width = term_width()
+        desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
+        print(issue["status"].ljust(lens["status"] + padding), end='')
+        print(str(issue["number"]).ljust(lens["number"] + padding), end='')
+        print(issue["tag"].ljust(lens["tag"] + padding), end='')
+        print(issue["date"].ljust(lens["date"] + padding), end='')
+        desc = issue["description"]
+        desc = desc.splitlines()[0]
+        if len(desc) >= desc_width:
+            desc = desc[:desc_width - 3]
+            desc += "..."
+        print(desc, end='')
+        print()
 
 def print_long(number):
     for issue in issues:
