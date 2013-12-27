@@ -245,7 +245,7 @@ def remove_issue(number):
     else:
         logging.error("Wrong issue number. Aborting.")
 
-def main():
+def parse_arguments():
     parser = argparse.ArgumentParser(description="Simple issue handler")
     subparsers = parser.add_subparsers(title="subcommands", dest="subparser")
 
@@ -295,7 +295,11 @@ def main():
     remove_parser.add_argument("number", type=int,
         help="Number of the issue you want to remove")
 
-    args = parser.parse_args()
+    return parser.parse_args()
+    
+
+def main():
+    args = parse_arguments()
 
     global issues
     if exists("ISSUES"):
