@@ -168,7 +168,7 @@ def print_long(number):
             print("Number:\t" + str(number))
             print("Tag:\t" + issue["tag"])
             print("Date:\t" + issue["date"])
-            print("\n" + issue["description"] + "\n")
+            print("\n" + issue["description"])
             break
 
 def save_issues():
