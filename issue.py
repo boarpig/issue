@@ -20,7 +20,7 @@ def term_width():
 
 def open_editor(number=-1):
     content = ""
-    if number != -1:
+    if number != -1: # Editing existing issue
         for issue in issues:
             if issue["number"] == number:
                 content = issue["description"]
@@ -28,7 +28,7 @@ def open_editor(number=-1):
         editor = os.environ['EDITOR']
         filename = f.name
         f.write(bytes(content, encoding="utf-8"))
-        f.flush()
+        f.flush() # Make sure file has appropriate content before opening
         ret = subprocess.call([editor, filename])
         if ret == 0:
             f.seek(0)
