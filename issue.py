@@ -176,16 +176,16 @@ def save_issues():
 
 def main():
     parser = argparse.ArgumentParser(description="Simple issue handler")
-    subparsers = parser.add_subparsers(help="subcommand help", dest="subparser")
+    subparsers = parser.add_subparsers(title="subcommands", dest="subparser")
 
-    add_parser = subparsers.add_parser("add", help="Add new issue.")
+    add_parser = subparsers.add_parser("add", help="Add new issue")
     add_parser.add_argument("-m", "--message", 
             help="""Message for the issue. if omitted, the $EDITOR will be
             invoked.""")
     add_parser.add_argument("-t", "--tag", default="bug",
             help="Specify tag for issue, default: %(default)s")
 
-    edit_parser = subparsers.add_parser("edit", help="Edit issue.")
+    edit_parser = subparsers.add_parser("edit", help="Edit individual issue")
     edit_parser.add_argument("number", type=int, help="Issue number to edit")
     edit_parser.add_argument("-m", "--message", default="",
             help="New message to replace the old.")
@@ -199,7 +199,7 @@ def main():
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
-    search_parser = subparsers.add_parser("search", help="search issues")
+    search_parser = subparsers.add_parser("search", help="Search issues")
     search_parser.add_argument("-s", "--status", default="open", 
             help="Filter issues by status. 'all' will list all issue."
             + " default: %(default)s")
@@ -208,7 +208,8 @@ def main():
     search_parser.add_argument("-d", "--description", 
             help="Filter issues by description.")
 
-    show_parser = subparsers.add_parser("show", help="Show individual issue.")
+    show_parser = subparsers.add_parser("show", 
+            help="Show more information on individual issue")
     show_parser.add_argument("number", type=int, help="Issue number to show")
 
     init_parser = subparsers.add_parser("init", help="Initialize issue file")
