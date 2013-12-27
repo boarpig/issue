@@ -168,8 +168,7 @@ def save_issues():
     global issues
     try:
         with open("ISSUES", "w") as f:
-            json.dump(issues, f, sort_keys=True, indent=4,
-                    separators=(",", ": "))
+            json.dump(issues, f)
     except PermissionError:
         logging.error("No permission to write to the file. " 
             + "Changes were not saved.")
