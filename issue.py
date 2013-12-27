@@ -47,8 +47,10 @@ def add_issue(message, tag):
     if len(issues) > 0:
         largest = max([issue["number"] for issue in issues])
     number = largest + 1
-    issues.append({"status": "open", "number": number, "tag": tag, 
-        "date": today, "description": message})
+    issue = {"status": "open", "number": number, "tag": tag, "date": today, 
+            "description": message}
+    issues.append(issue)
+    print_short([issue])
     save_issues()
 
 def search_issues(status="open", tag="", description=""):
