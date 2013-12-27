@@ -4,6 +4,7 @@ from datetime import date, datetime
 from os.path import exists
 from string import whitespace
 import argparse
+import gzip
 import json
 import logging
 import os
@@ -11,6 +12,7 @@ import subprocess
 import tempfile
 
 issues = []
+gzip_file = False
 logging.basicConfig(format='%(levelname)s:%(message)s')
 
 def term_width():
@@ -191,12 +193,21 @@ def print_long(number):
 
 def save_issues():
     global issues
-    try:
-        with open("ISSUES", "w") as f:
-            json.dump(issues, f)
-    except PermissionError:
-        logging.error("No permission to write to the file. " 
-            + "Changes were not saved.")
+    global gzip_file
+    if not gzip_file:
+        try:
+            with open("ISSUES", "w") as f:
+                json.dump(issues, f)
+        except PermissionError:
+            logging.error("No permission to write to the file. " 
+                + "Changes were not saved.")
+    else:
+        try:
+            with gzip.open("ISSUES.gz", mode="wt") as f:
+                json.dump(issues, f)
+        except PermissionError:
+            logging.error("No permission to write to the file. " 
+                + "Changes were not saved.")
     logging.info("Succesfully saved issues")
 
 def remove_issue(number):
@@ -281,6 +292,26 @@ def main():
         except PermissionError:
             logging.error("No permissions to read ISSUES file")
             exit(1)
+    elif exists("ISSUES.gz"):
+        global gzip_file
+        gzip_file = True
+        try:
+            with gzip.open("ISSUES.gz", "rt") as f:
+                try:
+                    content = f.read()
+                    if content.strip() != "":
+                        issues = json.loads(content)
+                except ValueError:
+                    logging.error("Error while loading json. "
+                            + "Maybe ISSUES file is corrupted.")
+            logging.info("Gzip file detected and read.")
+        except OSError:
+            logging.error("Not a gzip file, or other error.")
+            exit(1)
+        except PermissionError:
+            logging.error("No permissions to read ISSUES file")
+            exit(1)
+
     else:
         if args.subparser == "init":
             init(args.force)
