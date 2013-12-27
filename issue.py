@@ -119,9 +119,6 @@ def edit_issue(number, message="", tag="", status="", edit=False):
     save_issues()
 
 def init(force, compress):
-    if compress:
-        global gzip_file
-        gzip_file = True
     if exists("ISSUES") or exists("ISSUES.gz"):
         if force:
             now = datetime.today().strftime("%Y-%m-%d_%H%M%S")
@@ -142,6 +139,9 @@ def init(force, compress):
                     logging.info("Moved old issue file to {}".format(newfile))
                 except OSError:
                     logging.error("Could not rename file.")
+            if compress:
+                global gzip_file
+                gzip_file = True
             global issues
             issues = []
             save_issues()
@@ -150,6 +150,9 @@ def init(force, compress):
             logging.error("ISSUES file already exists.")
             print("Use --force to make one anyway.")
     else:
+        if compress:
+            global gzip_file
+            gzip_file = True
         logging.info("Created a new issue file.")
         save_issues()
 
