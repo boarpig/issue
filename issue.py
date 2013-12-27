@@ -265,7 +265,8 @@ def main():
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
-    search_parser = subparsers.add_parser("search", aliases=["se"], help="Search issues")
+    search_parser = subparsers.add_parser("search", aliases=["se"], 
+            help="Search issues")
     search_parser.add_argument("-s", "--status", default="open", 
             help="Filter issues by status. 'all' will list all issues."
             + " default: %(default)s")
