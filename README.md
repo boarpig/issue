@@ -8,18 +8,18 @@ keep issue tracking in your repository.
 
 ### Getting started
 
-    $ issue init
-    $ issue add -d "my new issue"
-    $ issue add -t enhancement -d "my enhancement proposal"
-    $ issue
+    $ issue.py init
+    $ issue.py add -d "my new issue"
+    $ issue.py add -t enhancement -d "my enhancement proposal"
+    $ issue.py
     open   1   bug           2013-12-27   my new issue
     open   2   enhancement   2013-12-27   my enhancement proposal
-    $ issue close 1
+    $ issue.py close 1
     closed   1   bug           2013-12-27   my new issue
 
 ### Usage
 
-    usage: issue [-h] [subcommand] ...
+    usage: issue.py [-h] [subcommand] ...
 
     Simple issue handler
 
@@ -174,7 +174,7 @@ width, you can use
 
 #### Example
 
-    $ issue show 7
+    $ issue.py show 7
     Status: open
     Number: 7
     Tag:    bug
