@@ -4,6 +4,8 @@ Small command line issue tracker mostly for those one person projects where you
 don't want to depend on something like github to track your issues but want to 
 keep issue tracking in your repository.
 
+Issue.py requires python3 but doesn't depend on any external libraries.
+
 ## Command-line
 
 ### Getting started
