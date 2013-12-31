@@ -177,6 +177,8 @@ def init(force, compress):
 def print_short(issuelist):
     os.system('clear')
     padding = 3
+    max_width = term_width()
+    # Use the column title length as min length
     lens = {
         "status": len('status'),
         "number": len('number'),
@@ -184,25 +186,27 @@ def print_short(issuelist):
         "date": len('date'),
         "description": len('description')
     }
-    if len(issuelist) > 1:
+    # Use custom length if a column value is longer than the column title
+    # liength
+    if len(issuelist) > 0:
         for issue in issuelist:
+            # Only use the first line of the description
+            # and strech if too long.
+            desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
+            d = issue['description']
+            d = d.splitlines()[0]
+            if len(d) >= desc_width:
+                d = d[:desc_width - 3]
+                d += '...'
+            issue['description'] = d
             for col in issue:
-                if col == "number":
-                    if len(str(issue[col])) > lens[col]:
+                if len(str(issue[col])) > lens[col]:
                         lens[col] = len(str(issue[col]))
-                else:
-                    if len(issue[col]) > lens[col]:
-                        lens[col] = len(issue[col])
-    elif len(issuelist) == 1:
-        issue = issuelist[0]
-        for col in issue:
-            if col == "number" and len(str(issue[col])) > lens[col]:
-                lens[col] = len(str(issue[col]))
-            elif col != "number" and len(issue[col]) > lens[col]:
-                lens[col] = len(issue[col])
     else:
         logging.warning("Issue list print requested but got nothing.")
         exit(1)
+    # All logic is done. Now we juste have to print the informations.
+    # Print a bold column header
     print('\033[1m', end='')
     print('status'.ljust(lens['status'] + padding), end='')
     print('number'.ljust(lens['number'] + padding), end='')
@@ -212,18 +216,11 @@ def print_short(issuelist):
     print('\033[0m', end='')
     print()
     for issue in issuelist:
-        max_width = term_width()
-        desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
         print(issue["status"].ljust(lens["status"] + padding), end='')
         print(str(issue["number"]).ljust(lens["number"] + padding), end='')
         print(issue["tag"].ljust(lens["tag"] + padding), end='')
         print(issue["date"].ljust(lens["date"] + padding), end='')
-        desc = issue["description"]
-        desc = desc.splitlines()[0]
-        if len(desc) >= desc_width:
-            desc = desc[:desc_width - 3]
-            desc += "..."
-        print(desc, end='')
+        print(issue['description'], end='')
         print()
 
 def print_long(number):
