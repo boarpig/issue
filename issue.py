@@ -29,10 +29,10 @@ issues = []
 gzip_file = False
 logging.basicConfig(format='%(levelname)s:%(message)s')
 
-def term_width():
+def term_size():
     # http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
     rows, columns = os.popen('stty size', 'r').read().split()
-    return int(columns)
+    return int(rows), int(columns)
 
 def open_editor(number=-1):
     content = ""
@@ -175,9 +175,9 @@ def init(force, compress):
         save_issues()
 
 def print_short(issuelist):
-    os.system('clear')
+    rows, max_width = term_size()
+    print('\033[2J\033[{}A'.format(rows), end='')
     padding = 3
-    max_width = term_width()
     # Use the column title length as min length
     lens = {
         "status": len('status'),
