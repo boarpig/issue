@@ -216,12 +216,29 @@ def print_short(issuelist):
     print('\033[0m', end='')
     print()
     for issue in issuelist:
+        print(get_status_color(issue['status']), end='')
         print(issue["status"].ljust(lens["status"] + padding), end='')
+        print(get_status_color(''), end='')
         print(str(issue["number"]).ljust(lens["number"] + padding), end='')
         print(issue["tag"].ljust(lens["tag"] + padding), end='')
         print(issue["date"].ljust(lens["date"] + padding), end='')
         print(issue['description'], end='')
         print()
+
+def get_status_color(status):
+    """ Return a unicode color string depending the status. """
+    status = status.lower()
+
+    if status == 'open':
+        return '\033[92m'
+    elif status == 'closed':
+        return '\033[91m'
+    elif status == 'in progress':
+        return '\033[93m'
+    elif status == 'wontfix':
+        return '\033[95m'
+    else:
+        return '\033[0m'
 
 def print_long(number):
     os.system('clear')
