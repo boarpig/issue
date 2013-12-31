@@ -244,7 +244,10 @@ def print_long(number):
     os.system('clear')
     for issue in issues:
         if issue["number"] == number:
-            print("\033[1mStatus:\033[0m\t" + issue["status"])
+            print("\033[1mStatus:\033[0m\t", end='')
+            print(get_status_color(issue['status']), end='')
+            print(issue['status'], end='')
+            print(get_status_color(''))
             print("\033[1mNumber:\033[0m\t" + str(number))
             print("\033[1mTag:\033[0m\t" + issue["tag"])
             print("\033[1mDate:\033[0m\t" + issue["date"])
