@@ -1,16 +1,16 @@
 #!/usr/bin/python3
-# 
+#
 # Copyright (c) 2013 Lauri Hakko
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
@@ -63,7 +63,7 @@ def add_issue(description, tags):
     if len(issues) > 0:
         largest = max([issue["number"] for issue in issues])
     number = largest + 1
-    issue = {"status": "open", "number": number, "tag": tags, "date": today, 
+    issue = {"status": "open", "number": number, "tag": tags, "date": today,
             "description": description}
     issues.append(issue)
     print_short([issue])
@@ -76,7 +76,7 @@ def search_issues(status="open", tags="", description=""):
         issues = [issue for issue in issues if issue["status"] == status]
     if tags:
         for tag in tags.split(","):
-            issues = [issue for issue in issues 
+            issues = [issue for issue in issues
                     if issue["tag"].lstrip().find(tag) != -1]
     if description:
         description = description.lower()
@@ -126,7 +126,7 @@ def edit_issue(number, message="", tags="", status="", edit=False):
                 elif edit:
                     new_desc = open_editor(number)
                     if new_desc.strip("\n\r" + whitespace) == "":
-                        print("Got empty issue description. " 
+                        print("Got empty issue description. "
                                 + "Issue left unchanged.")
                         exit(0)
                     else:
@@ -147,7 +147,7 @@ def init(force, compress):
             else:
                 newfile = "ISSUES_" + now
             if exists(newfile):
-                logging.error("Could not rename old file. Filename already" 
+                logging.error("Could not rename old file. Filename already"
                         + " exists.")
                 exit(1)
             else:
@@ -175,49 +175,80 @@ def init(force, compress):
         save_issues()
 
 def print_short(issuelist):
-    lens = {"status": 0, "number": 0,"tag": 0, "date": 0, "description":0}
-    if len(issuelist) > 1:
+    os.system('clear')
+    padding = 3
+    max_width = term_width()
+    # Use the column title length as min length
+    lens = {
+        "status": len('status'),
+        "number": len('number'),
+        "tag": len('tag'),
+        "date": len('date'),
+        "description": len('description')
+    }
+    # Use custom length if a column value is longer than the column title
+    # liength
+    if len(issuelist) > 0:
         for issue in issuelist:
+            # Only use the first line of the description
+            # and strech if too long.
+            desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
+            d = issue['description']
+            d = d.splitlines()[0]
+            if len(d) >= desc_width:
+                d = d[:desc_width - 3]
+                d += '...'
+            issue['description'] = d
             for col in issue:
-                if col == "number":
-                    if len(str(issue[col])) > lens[col]:
+                if len(str(issue[col])) > lens[col]:
                         lens[col] = len(str(issue[col]))
-                else:
-                    if len(issue[col]) > lens[col]:
-                        lens[col] = len(issue[col])
-    elif len(issuelist) == 1:
-        issue = issuelist[0]
-        for col in issue:
-            if col == "number" and len(str(issue[col])) > lens[col]:
-                lens[col] = len(str(issue[col]))
-            elif col != "number" and len(issue[col]) > lens[col]:
-                lens[col] = len(issue[col])
     else:
         logging.warning("Issue list print requested but got nothing.")
         exit(1)
+    # All logic is done. Now we juste have to print the informations.
+    # Print a bold column header
+    print('\033[1m', end='')
+    print('status'.ljust(lens['status'] + padding), end='')
+    print('number'.ljust(lens['number'] + padding), end='')
+    print('tag'.ljust(lens['tag'] + padding), end='')
+    print('date'.ljust(lens['date'] + padding), end='')
+    print('description'.ljust(lens['description'] + padding), end='')
+    print('\033[0m', end='')
+    print()
     for issue in issuelist:
-        padding = 3
-        max_width = term_width()
-        desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
+        print(get_status_color(issue['status']), end='')
         print(issue["status"].ljust(lens["status"] + padding), end='')
+        print(get_status_color(''), end='')
         print(str(issue["number"]).ljust(lens["number"] + padding), end='')
         print(issue["tag"].ljust(lens["tag"] + padding), end='')
         print(issue["date"].ljust(lens["date"] + padding), end='')
-        desc = issue["description"]
-        desc = desc.splitlines()[0]
-        if len(desc) >= desc_width:
-            desc = desc[:desc_width - 3]
-            desc += "..."
-        print(desc, end='')
+        print(issue['description'], end='')
         print()
 
+def get_status_color(status):
+    """ Return a unicode color string depending the status. """
+    status = status.lower()
+
+    if status == 'open':
+        return '\033[92m'
+    elif status == 'closed':
+        return '\033[91m'
+    elif status == 'wontfix':
+        return '\033[95m'
+    else:
+        return '\033[0m'
+
 def print_long(number):
+    os.system('clear')
     for issue in issues:
         if issue["number"] == number:
-            print("Status:\t" + issue["status"])
-            print("Number:\t" + str(number))
-            print("Tag:\t" + issue["tag"])
-            print("Date:\t" + issue["date"])
+            print("\033[1mStatus:\033[0m\t", end='')
+            print(get_status_color(issue['status']), end='')
+            print(issue['status'], end='')
+            print(get_status_color(''))
+            print("\033[1mNumber:\033[0m\t" + str(number))
+            print("\033[1mTag:\033[0m\t" + issue["tag"])
+            print("\033[1mDate:\033[0m\t" + issue["date"])
             print("\n" + issue["description"])
             break
 
@@ -229,14 +260,14 @@ def save_issues():
             with open("ISSUES", "w") as f:
                 json.dump(issues, f)
         except PermissionError:
-            logging.error("No permission to write to the file. " 
+            logging.error("No permission to write to the file. "
                 + "Changes were not saved.")
     else:
         try:
             with gzip.open("ISSUES.gz", mode="wt") as f:
                 json.dump(issues, f)
         except PermissionError:
-            logging.error("No permission to write to the file. " 
+            logging.error("No permission to write to the file. "
                 + "Changes were not saved.")
     logging.info("Succesfully saved issues")
 
@@ -284,24 +315,24 @@ def parse_arguments():
     close_parser = subparsers.add_parser("close", help="Close an issue")
     close_parser.add_argument("number", type=int, help="Issue number to close")
 
-    search_parser = subparsers.add_parser("search", aliases=["se"], 
+    search_parser = subparsers.add_parser("search", aliases=["se"],
             help="Search issues")
-    search_parser.add_argument("-s", "--status", default="open", 
+    search_parser.add_argument("-s", "--status", default="open",
             help="Filter issues by status. 'all' will list all issues."
             + " default: %(default)s")
-    search_parser.add_argument("-t", "--tags", 
+    search_parser.add_argument("-t", "--tags",
             help="Filter issues by tags.")
     search_parser.add_argument("-d", "--description", metavar="TEXT",
             help="Filter issues by description.")
 
-    show_parser = subparsers.add_parser("show", 
+    show_parser = subparsers.add_parser("show",
             help="Show more information on individual issue")
     show_parser.add_argument("number", type=int, help="Issue number to show")
 
     init_parser = subparsers.add_parser("init", help="Initialize issue file")
-    init_parser.add_argument("-f", "--force", action="store_true", 
+    init_parser.add_argument("-f", "--force", action="store_true",
             help="Make issue files regardless if one exists already.")
-    init_parser.add_argument("-g", "--gzip", action="store_true", 
+    init_parser.add_argument("-g", "--gzip", action="store_true",
             help="Make gzip compressed issue file.")
 
     remove_parser = subparsers.add_parser("remove", aliases=["rm"],
@@ -310,7 +341,7 @@ def parse_arguments():
         help="Number of the issue you want to remove")
 
     return parser.parse_args()
-    
+
 def load_issues(args):
     global issues
     if exists("ISSUES"):
@@ -370,7 +401,7 @@ def main():
     elif args.subparser == "close":
         edit_issue(args.number, status="closed")
     elif args.subparser == "edit":
-        edit_issue(args.number, message=args.message, tags=args.tags, 
+        edit_issue(args.number, message=args.message, tags=args.tags,
                 status=args.status, edit=args.edit)
     elif args.subparser == "remove" or args.subparser == "rm":
         remove_issue(args.number)
