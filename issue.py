@@ -176,7 +176,14 @@ def init(force, compress):
 
 def print_short(issuelist):
     os.system('clear')
-    lens = {"status": 0, "number": 0,"tag": 0, "date": 0, "description":0}
+    padding = 3
+    lens = {
+        "status": len('status'),
+        "number": len('number'),
+        "tag": len('tag'),
+        "date": len('date'),
+        "description": len('description')
+    }
     if len(issuelist) > 1:
         for issue in issuelist:
             for col in issue:
@@ -196,8 +203,15 @@ def print_short(issuelist):
     else:
         logging.warning("Issue list print requested but got nothing.")
         exit(1)
+    print('\033[1m', end='')
+    print('status'.ljust(lens['status'] + padding), end='')
+    print('number'.ljust(lens['number'] + padding), end='')
+    print('tag'.ljust(lens['tag'] + padding), end='')
+    print('date'.ljust(lens['date'] + padding), end='')
+    print('description'.ljust(lens['description'] + padding), end='')
+    print('\033[0m', end='')
+    print()
     for issue in issuelist:
-        padding = 4
         max_width = term_width()
         desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
         print(issue["status"].ljust(lens["status"] + padding), end='')
@@ -216,10 +230,10 @@ def print_long(number):
     os.system('clear')
     for issue in issues:
         if issue["number"] == number:
-            print("Status:\t" + issue["status"])
-            print("Number:\t" + str(number))
-            print("Tag:\t" + issue["tag"])
-            print("Date:\t" + issue["date"])
+            print("\033[1mStatus:\033[0m\t" + issue["status"])
+            print("\033[1mNumber:\033[0m\t" + str(number))
+            print("\033[1mTag:\033[0m\t" + issue["tag"])
+            print("\033[1mDate:\033[0m\t" + issue["date"])
             print("\n" + issue["description"])
             break
 
