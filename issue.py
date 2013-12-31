@@ -233,8 +233,6 @@ def get_status_color(status):
         return '\033[92m'
     elif status == 'closed':
         return '\033[91m'
-    elif status == 'in progress':
-        return '\033[93m'
     elif status == 'wontfix':
         return '\033[95m'
     else:
