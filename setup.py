@@ -7,12 +7,13 @@ with open('README.rst') as file:
 
 setup(
         name = "issue", 
-        version = '0.1.1',
+        version = '0.1.2',
         description = "Simple issue tracker to use with VCS",
         long_description = long_description,
         author = "Lauri Hakko",
         author_email = "lauri.hakko@gmail.com",
         url = "https://github.com/boarpig/issue",
+        scripts=['issue.py'],
         classifiers = [
             'Environment :: Console',
             'Intended Audience :: Developers',
