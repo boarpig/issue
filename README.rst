@@ -16,13 +16,23 @@ Install
 
 ::
 
-    $ easy_install issue
+    # easy_install issue
 
 or
 
 ::
 
-    $ pip install issue
+    # pip install issue
+
+or if you want to install it just for yourself without root access, you can add 
+``--user`` to either of those commands, e.g.
+
+::
+
+    $ pip install --user issue
+
+and it will install issue.py in ~/.local/bin/ which you can just add to your
+$PATH.
 
 Getting started
 ~~~~~~~~~~~~~~~
