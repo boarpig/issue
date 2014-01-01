@@ -7,8 +7,22 @@ issues but want to keep issue tracking in your repository.
 
 Issue.py requires python3 but doesn't depend on any external libraries.
 
+
 Command-line
 ------------
+
+Install
+~~~~~~~
+
+::
+
+    $ easy_install issue
+
+or
+
+::
+
+    pip install issue
 
 Getting started
 ~~~~~~~~~~~~~~~
