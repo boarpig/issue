@@ -18,21 +18,25 @@ from datetime import date, datetime
 from os.path import exists
 from string import whitespace
 import argparse
+import array
+import fcntl
 import gzip
 import json
 import logging
 import os
 import subprocess
 import tempfile
+import termios
 
 issues = []
 gzip_file = False
 logging.basicConfig(format='%(levelname)s:%(message)s')
 
 def term_size():
-    # http://stackoverflow.com/questions/566746/how-to-get-console-window-width-in-python
-    rows, columns = os.popen('stty size', 'r').read().split()
-    return int(rows), int(columns)
+    buf = array.array('h', [0, 0])
+    _ = fcntl.ioctl(0, termios.TIOCGWINSZ, buf, 1)
+    rows, columns = buf
+    return rows, columns
 
 def open_editor(number=-1):
     content = ""
