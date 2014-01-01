@@ -239,7 +239,8 @@ def get_status_color(status):
         return '\033[0m'
 
 def print_long(number):
-    os.system('clear')
+    rows, max_width = term_size()
+    print('\033[2J\033[{}A'.format(rows), end='')
     for issue in issues:
         if issue["number"] == number:
             print("\033[1mStatus:\033[0m\t", end='')
