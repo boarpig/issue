@@ -22,7 +22,7 @@ or
 
 ::
 
-    pip install issue
+    $ pip install issue
 
 Getting started
 ~~~~~~~~~~~~~~~
