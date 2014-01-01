@@ -7,7 +7,7 @@ with open('README.rst') as file:
 
 setup(
         name = "issue", 
-        version = 0.1,
+        version = '0.1',
         description = "Simple issue tracker to use with VCS",
         long_description = long_description,
         author = "Lauri Hakko",

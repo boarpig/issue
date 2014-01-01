@@ -1,1 +1,1 @@
-include issue.py MANIFEST.in LICENSE
+include issue.py README.rst MANIFEST.in LICENSE
