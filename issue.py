@@ -194,15 +194,6 @@ def print_short(issuelist):
     # liength
     if len(issuelist) > 0:
         for issue in issuelist:
-            # Only use the first line of the description
-            # and strech if too long.
-            desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
-            d = issue['description']
-            d = d.splitlines()[0]
-            if len(d) >= desc_width:
-                d = d[:desc_width - 3]
-                d += '...'
-            issue['description'] = d
             for col in issue:
                 if len(str(issue[col])) > lens[col]:
                         lens[col] = len(str(issue[col]))
@@ -220,6 +211,15 @@ def print_short(issuelist):
     print('\033[0m', end='')
     print()
     for issue in issuelist:
+        # Only use the first line of the description
+        # and strech if too long.
+        desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
+        d = issue['description']
+        d = d.splitlines()[0]
+        if len(d) >= desc_width:
+            d = d[:desc_width - 3]
+            d += '...'
+        issue['description'] = d
         print(get_status_color(issue['status']), end='')
         print(issue["status"].ljust(lens["status"] + padding), end='')
         print(get_status_color(''), end='')
