@@ -1,3 +1,6 @@
 *.py[co]
 *~
 ISSUES
+build
+dist
+MANIFEST
