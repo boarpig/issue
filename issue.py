@@ -72,6 +72,47 @@ class Issues(object):
         self.issues = []
         self.gzip_file = False
 
+    def load_issues(self, args):
+        if exists("ISSUES"):
+            try:
+                with open("ISSUES") as f:
+                    try:
+                        content = f.read()
+                        if content.strip() != "":
+                            self.issues = json.loads(content)
+                    except ValueError:
+                        logging.error("Error while loading json. "
+                                + "Maybe ISSUES file is corrupted.")
+            except PermissionError:
+                logging.error("No permissions to read ISSUES file")
+                exit(1)
+        elif exists("ISSUES.gz"):
+            self.gzip_file = True
+            try:
+                with gzip.open("ISSUES.gz", "rt") as f:
+                    try:
+                        content = f.read()
+                        if content.strip() != "":
+                            self.issues = json.loads(content)
+                    except ValueError:
+                        logging.error("Error while loading json. "
+                                + "Maybe ISSUES file is corrupted.")
+                logging.info("Gzip file detected and read.")
+            except OSError:
+                logging.error("Not a gzip file, or other error.")
+                exit(1)
+            except PermissionError:
+                logging.error("No permissions to read ISSUES file")
+                exit(1)
+        else:
+            if args.subparser == "init":
+                self.init(args.force, args.gzip)
+                exit(0)
+            else:
+                logging.warning("ISSUES file does not exist.")
+                print("You can create one with\n\n $ issue init\n")
+                exit(1)
+
     def add_issue(self, description, tags):
         if not description:
             description = open_editor()
@@ -283,47 +324,6 @@ class Issues(object):
             logging.info("Removed an issue.")
         else:
             logging.error("Wrong issue number. Aborting.")
-
-    def load_issues(self, args):
-        if exists("ISSUES"):
-            try:
-                with open("ISSUES") as f:
-                    try:
-                        content = f.read()
-                        if content.strip() != "":
-                            self.issues = json.loads(content)
-                    except ValueError:
-                        logging.error("Error while loading json. "
-                                + "Maybe ISSUES file is corrupted.")
-            except PermissionError:
-                logging.error("No permissions to read ISSUES file")
-                exit(1)
-        elif exists("ISSUES.gz"):
-            self.gzip_file = True
-            try:
-                with gzip.open("ISSUES.gz", "rt") as f:
-                    try:
-                        content = f.read()
-                        if content.strip() != "":
-                            self.issues = json.loads(content)
-                    except ValueError:
-                        logging.error("Error while loading json. "
-                                + "Maybe ISSUES file is corrupted.")
-                logging.info("Gzip file detected and read.")
-            except OSError:
-                logging.error("Not a gzip file, or other error.")
-                exit(1)
-            except PermissionError:
-                logging.error("No permissions to read ISSUES file")
-                exit(1)
-        else:
-            if args.subparser == "init":
-                init(args.force, args.gzip)
-                exit(0)
-            else:
-                logging.warning("ISSUES file does not exist.")
-                print("You can create one with\n\n $ issue init\n")
-                exit(1)
 
     def save_issues(self):
         if not self.gzip_file:
