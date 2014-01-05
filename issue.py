@@ -199,7 +199,8 @@ class Issues(object):
         self.save_issues()
 
     def init(self, force, compress):
-        if exists("ISSUES") or exists("ISSUES.gz"):
+        self.gzip_file = exists("ISSUES.gz")
+        if exists("ISSUES") or self.gzip_file:
             if force:
                 now = datetime.today().strftime("%Y-%m-%d_%H%M%S")
                 if self.gzip_file:
