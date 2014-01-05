@@ -37,6 +37,18 @@ def term_size():
     return rows, columns
 
 
+def open_editor(content=""):
+    with tempfile.NamedTemporaryFile() as f:
+        editor = os.environ['EDITOR']
+        filename = f.name
+        f.write(bytes(content, encoding="utf-8"))
+        f.flush() # Make sure file has appropriate content before open
+        ret = subprocess.call([editor, filename])
+        if ret == 0:
+            f.seek(0)
+            content = str(f.read(), encoding="utf-8")
+            content = content.strip("\n\r")
+    return content
 
 
 def get_status_color(status):
@@ -62,7 +74,7 @@ class Issues(object):
 
     def add_issue(self, description, tags):
         if not description:
-            description = self.open_editor()
+            description = open_editor()
             if description.strip() == "":
                 print("Empty issue description. Aborting.")
                 exit(1)
@@ -131,7 +143,8 @@ class Issues(object):
                     elif message:
                         issue["description"] = message
                     elif edit:
-                        new_desc = self.open_editor(number)
+                        current_desc = self.get_issue_content(number)
+                        new_desc = open_editor(current_desc)
                         if new_desc.strip("\n\r" + whitespace) == "":
                             print("Got empty issue description. "
                                     + "Issue left unchanged.")
@@ -179,22 +192,12 @@ class Issues(object):
             logging.info("Created a new issue file.")
             self.save_issues()
 
-    def open_editor(self, number=-1):
+    def get_issue_content(self, number=-1):
         content = ""
-        if number != -1: # Editing existing issue
+        if number != -1:
             for issue in self.issues:
                 if issue["number"] == number:
                     content = issue["description"]
-        with tempfile.NamedTemporaryFile() as f:
-            editor = os.environ['EDITOR']
-            filename = f.name
-            f.write(bytes(content, encoding="utf-8"))
-            f.flush() # Make sure file has appropriate content before opening
-            ret = subprocess.call([editor, filename])
-            if ret == 0:
-                f.seek(0)
-                content = str(f.read(), encoding="utf-8")
-                content = content.strip("\n\r")
         return content
 
     def print_short(self, issuelist):
