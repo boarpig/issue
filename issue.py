@@ -72,7 +72,7 @@ class Issues(object):
         self.issues = []
         self.gzip_file = False
 
-    def load_issues(self, args):
+    def load_issues(self):
         if exists("ISSUES"):
             try:
                 with open("ISSUES") as f:
@@ -105,13 +105,9 @@ class Issues(object):
                 logging.error("No permissions to read ISSUES file")
                 exit(1)
         else:
-            if args.subparser == "init":
-                self.init(args.force, args.gzip)
-                exit(0)
-            else:
-                logging.warning("ISSUES file does not exist.")
-                print("You can create one with\n\n $ issue init\n")
-                exit(1)
+            logging.warning("ISSUES file does not exist.")
+            print("You can create one with\n\n $ issue init\n")
+            exit(1)
 
     def add_issue(self, description, tags):
         if not description:
@@ -343,6 +339,7 @@ class Issues(object):
                     + "Changes were not saved.")
         logging.info("Succesfully saved issues")
 
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description="Simple issue handler")
     subparsers = parser.add_subparsers(title="subcommands", dest="subparser")
@@ -399,10 +396,15 @@ def parse_arguments():
 def main():
     issues = Issues()
     args = parse_arguments()
-    issues.load_issues(args)
+
+    # if init is called, do that and exit
     if args.subparser == "init":
         issues.init(args.force, args.gzip)
-    elif args.subparser == "add":
+        exit(0)
+
+    # otherwise load issues from file and continue
+    issues.load_issues()
+    if args.subparser == "add":
         issues.add_issue(args.description, args.tags)
     elif args.subparser == "show":
         issues.print_long(args.number)
