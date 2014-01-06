@@ -1,13 +1,14 @@
 #!/usr/bin/python
 
 from distutils.core import setup
+from issue import VERSION
 
 with open('README.rst') as file:
     long_description = file.read()
 
 setup(
         name = "issue", 
-        version = '0.1.2',
+        version = VERSION,
         description = "Simple issue tracker to use with VCS",
         long_description = long_description,
         author = "Lauri Hakko",
