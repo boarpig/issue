@@ -308,7 +308,7 @@ class Issues(object):
         if number == int(other):
             self.issues = [issue for issue in self.issues 
                            if issue["number"] != number]
-            save_issues()
+            self.save_issues()
             logging.info("Removed an issue.")
         else:
             logging.error("Wrong issue number. Aborting.")
