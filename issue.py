@@ -227,6 +227,7 @@ class Issues(object):
             for issue in self.issues:
                 if issue["number"] == number:
                     content = issue["description"]
+                    break
         return content
 
     def print_short(self, issuelist):
