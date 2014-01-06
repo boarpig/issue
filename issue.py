@@ -30,7 +30,7 @@ import termios
 
 logging.basicConfig(format='%(levelname)s:%(message)s')
 
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 
 def term_size():
     buf = array.array('h', [0, 0])
