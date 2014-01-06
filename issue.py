@@ -115,8 +115,8 @@ class Issues(object):
         if len(self.issues) > 0:
             largest = max([issue["number"] for issue in self.issues])
         number = largest + 1
-        issue = {"status": "open", "number": number, "tag": tags, "date": today,
-                 "description": description}
+        issue = {"status": "open", "number": number, "tag": tags,
+                 "date": today, "description": description}
         self.issues.append(issue)
         self.print_short([issue])
         logging.info("Added a new issue:\n{}".format(issue))
@@ -248,7 +248,7 @@ class Issues(object):
             for issue in issuelist:
                 for col in issue:
                     if len(str(issue[col])) > lens[col]:
-                            lens[col] = len(str(issue[col]))
+                        lens[col] = len(str(issue[col]))
         else:
             logging.warning("Issue list print requested but got nothing.")
             exit(1)
