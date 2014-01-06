@@ -192,24 +192,17 @@ class Issues(object):
         self.save_issues()
 
     def init(self, force, compress):
-        self.gzip_file = exists("ISSUES.gz")
-        if exists("ISSUES") or self.gzip_file:
+        if self.filename:
             if force:
                 now = datetime.today().strftime("%Y-%m-%d_%H%M%S")
-                if self.gzip_file:
-                    newfile = "ISSUES.gz_" + now
-                else:
-                    newfile = "ISSUES_" + now
+                newfile = self.filename + "_" + now
                 if exists(newfile):
                     logging.error("Could not rename old file. Filename "
                                   + "already exists.")
                     exit(1)
                 else:
                     try:
-                        if self.gzip_file:
-                            os.rename("ISSUES.gz", newfile)
-                        else:
-                            os.rename("ISSUES", newfile)
+                        os.rename(filename, newfile)
                         logging.info("Moved old issue file to {}"
                                      .format(newfile))
                     except OSError:
