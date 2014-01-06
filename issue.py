@@ -86,13 +86,12 @@ class Issues(object):
             exit(1)
         try:
             with generic_open(filename, "rt") as f:
-                try:
-                    content = f.read()
-                    if content.strip() != "":
-                        self.issues = json.loads(content)
-                except ValueError:
-                    logging.error("Error while loading json. "
-                            + "Maybe ISSUES file is corrupted.")
+                content = f.read()
+                if content.strip() != "":
+                    self.issues = json.loads(content)
+        except ValueError:
+            logging.error("Error while loading json. "
+                    + "Maybe ISSUES file is corrupted.")
         except OSError as err:
             logging.error(os.strerror(err.errno))
             exit(1)
