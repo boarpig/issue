@@ -78,7 +78,6 @@ class Issues(object):
             self.filename = "ISSUES.gz"
             self.gzip_file = True
 
-
     def load_issues(self):
         if self.filename = "ISSUES":
             generic_open = open
@@ -95,7 +94,7 @@ class Issues(object):
                     self.issues = json.loads(content)
         except ValueError:
             logging.error("Error while loading json. "
-                    + "Maybe ISSUES file is corrupted.")
+                          + "Maybe ISSUES file is corrupted.")
         except OSError as err:
             logging.error(os.strerror(err.errno))
             exit(1)
@@ -115,7 +114,7 @@ class Issues(object):
             largest = max([issue["number"] for issue in self.issues])
         number = largest + 1
         issue = {"status": "open", "number": number, "tag": tags, "date": today,
-                "description": description}
+                 "description": description}
         self.issues.append(issue)
         self.print_short([issue])
         logging.info("Added a new issue:\n{}".format(issue))
@@ -149,8 +148,9 @@ class Issues(object):
                         for tag in tags[1:].split(","):
                             if len(tag) > 20:
                                 tag = tag[:20]
-                                logging.warning("Tag length is over 20 characters. "
-                                    + "Shortening it to 20 characters.")
+                                message = ("Tag length is over 20 characters. "
+                                           + "Shortening it to 20 characters.")
+                                logging.warning(message)
                             issue["tag"] += "," + tag
                     elif tags[0] == '-':
                         removes = tags[1:].split(",")
@@ -164,8 +164,9 @@ class Issues(object):
                             issue["tag"] = ""
                             if len(tag) > 20:
                                 tag = tag[:20]
-                                logging.warning("Tag length is over 20 characters. "
-                                    + "Shortening it to 20 characters.")
+                                message = ("Tag length is over 20 characters. "
+                                           + "Shortening it to 20 characters.")
+                                logging.warning(message)
                             issue["tag"] += "," + tag
                     issue["tag"] = issue["tag"].lstrip(",")
                 if message or edit:
@@ -178,7 +179,7 @@ class Issues(object):
                         new_desc = open_editor(current_desc)
                         if new_desc.strip("\n\r" + whitespace) == "":
                             print("Got empty issue description. "
-                                    + "Issue left unchanged.")
+                                  + "Issue left unchanged.")
                             exit(0)
                         else:
                             issue["description"] = new_desc
@@ -198,8 +199,8 @@ class Issues(object):
                 else:
                     newfile = "ISSUES_" + now
                 if exists(newfile):
-                    logging.error("Could not rename old file. Filename already"
-                            + " exists.")
+                    logging.error("Could not rename old file. Filename "
+                                  + "already exists.")
                     exit(1)
                 else:
                     try:
@@ -207,7 +208,8 @@ class Issues(object):
                             os.rename("ISSUES.gz", newfile)
                         else:
                             os.rename("ISSUES", newfile)
-                        logging.info("Moved old issue file to {}".format(newfile))
+                        logging.info("Moved old issue file to {}"
+                                     .format(newfile))
                     except OSError:
                         logging.error("Could not rename file.")
                 if compress:
@@ -245,7 +247,7 @@ class Issues(object):
             "description": len('description')
         }
         # Use custom length if a column value is longer than the column title
-        # liength
+        # length
         if len(issuelist) > 0:
             for issue in issuelist:
                 for col in issue:
@@ -267,7 +269,8 @@ class Issues(object):
         for issue in issuelist:
             # Only use the first line of the description
             # and strech if too long.
-            desc_width = max_width - (sum(lens.values()) - lens["description"]) - 12
+            desc_width = (max_width - (sum(lens.values()) 
+                          - lens["description"]) - 12)
             d = issue['description'][:]
             d = d.splitlines()[0]
             if len(d) >= desc_width:
@@ -299,7 +302,7 @@ class Issues(object):
 
     def remove_issue(self, number):
         print("Warning! You are about to remove following issue. "
-                + "This cannot be undone!")
+              + "This cannot be undone!")
         self.print_long(number)
         print("To confirm, please retype the issue number: ", end="")
         other = input()
@@ -326,7 +329,7 @@ class Issues(object):
                 json.dump(self.issues, f)
         except PermissionError:
             logging.error("No permission to write to the file. "
-                + "Changes were not saved.")
+                          + "Changes were not saved.")
         logging.info("Succesfully saved issues")
 
 
@@ -400,12 +403,12 @@ def main():
         issues.print_long(args.number)
     elif args.subparser == "search" or args.subparser == "se":
         issues.search_issues(status=args.status, tags=args.tags,
-                description=args.description)
+                             description=args.description)
     elif args.subparser == "close":
         issues.edit_issue(args.number, status="closed")
     elif args.subparser == "edit":
         issues.edit_issue(args.number, message=args.message, tags=args.tags,
-                status=args.status, edit=args.edit)
+                          status=args.status, edit=args.edit)
     elif args.subparser == "remove" or args.subparser == "rm":
         issues.remove_issue(args.number)
     else:
