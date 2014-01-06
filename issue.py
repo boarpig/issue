@@ -98,8 +98,8 @@ class Issues(object):
                         logging.error("Error while loading json. "
                                 + "Maybe ISSUES file is corrupted.")
                 logging.info("Gzip file detected and read.")
-            except OSError:
-                logging.error("Not a gzip file, or other error.")
+            except OSError as err:
+                logging.error(os.strerror(err.errno))
                 exit(1)
             except PermissionError:
                 logging.error("No permissions to read ISSUES file")
