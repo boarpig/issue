@@ -79,9 +79,9 @@ class Issues(object):
             self.gzip_file = True
 
     def load_issues(self):
-        if self.filename = "ISSUES":
+        if self.filename == "ISSUES":
             generic_open = open
-        elif self.filename = "ISSUES.gz":
+        elif self.filename == "ISSUES.gz":
             generic_open = gzip.open
         else:
             logging.warning("ISSUES file does not exist.")
