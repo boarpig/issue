@@ -70,22 +70,26 @@ class Issues(object):
 
     def __init__(self):
         self.issues = []
-        self.gzip_file = False
+        self.filename = ""
+        if exists("ISSUES"):
+            self.filename = "ISSUES"
+            self.gzip_file = False
+        elif exists("ISSUES.gz"):
+            self.filename = "ISSUES.gz"
+            self.gzip_file = True
+
 
     def load_issues(self):
-        if exists("ISSUES"):
-            filename = "ISSUES"
+        if self.filename = "ISSUES":
             generic_open = open
-        elif exists("ISSUES.gz"):
-            filename = "ISSUES.gz"
+        elif self.filename = "ISSUES.gz":
             generic_open = gzip.open
-            self.gzip_file = True
         else:
             logging.warning("ISSUES file does not exist.")
             print("You can create one with\n\n $ issue init\n")
             exit(1)
         try:
-            with generic_open(filename, "rt") as f:
+            with generic_open(self.filename, "rt") as f:
                 content = f.read()
                 if content.strip() != "":
                     self.issues = json.loads(content)
@@ -315,12 +319,10 @@ class Issues(object):
     def save_issues(self):
         if not self.gzip_file:
             generic_open = open
-            filename = "ISSUES"
         else:
             generic_open = gzip.open
-            filename = "ISSUES.gz"
         try:
-            with generic_open(filename, mode="wt") as f:
+            with generic_open(self.filename, mode="wt") as f:
                 json.dump(self.issues, f)
         except PermissionError:
             logging.error("No permission to write to the file. "
