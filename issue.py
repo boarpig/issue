@@ -74,39 +74,30 @@ class Issues(object):
 
     def load_issues(self):
         if exists("ISSUES"):
-            try:
-                with open("ISSUES") as f:
-                    try:
-                        content = f.read()
-                        if content.strip() != "":
-                            self.issues = json.loads(content)
-                    except ValueError:
-                        logging.error("Error while loading json. "
-                                + "Maybe ISSUES file is corrupted.")
-            except PermissionError:
-                logging.error("No permissions to read ISSUES file")
-                exit(1)
+            filename = "ISSUES"
+            generic_open = open
         elif exists("ISSUES.gz"):
+            filename = "ISSUES.gz"
+            generic_open = gzip.open
             self.gzip_file = True
-            try:
-                with gzip.open("ISSUES.gz", "rt") as f:
-                    try:
-                        content = f.read()
-                        if content.strip() != "":
-                            self.issues = json.loads(content)
-                    except ValueError:
-                        logging.error("Error while loading json. "
-                                + "Maybe ISSUES file is corrupted.")
-                logging.info("Gzip file detected and read.")
-            except OSError as err:
-                logging.error(os.strerror(err.errno))
-                exit(1)
-            except PermissionError:
-                logging.error("No permissions to read ISSUES file")
-                exit(1)
         else:
             logging.warning("ISSUES file does not exist.")
             print("You can create one with\n\n $ issue init\n")
+            exit(1)
+        try:
+            with generic_open(filename, "rt") as f:
+                try:
+                    content = f.read()
+                    if content.strip() != "":
+                        self.issues = json.loads(content)
+                except ValueError:
+                    logging.error("Error while loading json. "
+                            + "Maybe ISSUES file is corrupted.")
+        except OSError as err:
+            logging.error(os.strerror(err.errno))
+            exit(1)
+        except PermissionError:
+            logging.error("No permissions to read ISSUES file")
             exit(1)
 
     def add_issue(self, description, tags):
@@ -324,19 +315,17 @@ class Issues(object):
 
     def save_issues(self):
         if not self.gzip_file:
-            try:
-                with open("ISSUES", "w") as f:
-                    json.dump(self.issues, f)
-            except PermissionError:
-                logging.error("No permission to write to the file. "
-                    + "Changes were not saved.")
+            generic_open = open
+            filename = "ISSUES"
         else:
-            try:
-                with gzip.open("ISSUES.gz", mode="wt") as f:
-                    json.dump(self.issues, f)
-            except PermissionError:
-                logging.error("No permission to write to the file. "
-                    + "Changes were not saved.")
+            generic_open = gzip.open
+            filename = "ISSUES.gz"
+        try:
+            with gzip.open("ISSUES.gz", mode="wt") as f:
+                json.dump(self.issues, f)
+        except PermissionError:
+            logging.error("No permission to write to the file. "
+                + "Changes were not saved.")
         logging.info("Succesfully saved issues")
 
 
