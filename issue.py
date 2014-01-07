@@ -259,7 +259,7 @@ class Issues(object):
         print('number'.ljust(lens['number'] + padding), end='')
         print('tag'.ljust(lens['tag'] + padding), end='')
         print('date'.ljust(lens['date'] + padding), end='')
-        print('description'.ljust(lens['description'] + padding), end='')
+        print('description'), end='')
         print('\033[0m', end='')
         print()
         for issue in issuelist:
