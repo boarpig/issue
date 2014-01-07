@@ -249,17 +249,19 @@ class Issues(object):
                 for col in issue:
                     if len(str(issue[col])) > lens[col]:
                         lens[col] = len(str(issue[col]))
+            for column in lens:
+                lens[column] += padding
         else:
             logging.warning("Issue list print requested but got nothing.")
             exit(1)
         # All logic is done. Now we juste have to print the informations.
         # Print a bold column header
         print('\033[1m', end='')
-        print('status'.ljust(lens['status'] + padding), end='')
-        print('number'.ljust(lens['number'] + padding), end='')
-        print('tag'.ljust(lens['tag'] + padding), end='')
-        print('date'.ljust(lens['date'] + padding), end='')
-        print('description'), end='')
+        print('status'.ljust(lens['status']), end='')
+        print('number'.ljust(lens['number']), end='')
+        print('tag'.ljust(lens['tag']), end='')
+        print('date'.ljust(lens['date']), end='')
+        print('description', end='')
         print('\033[0m', end='')
         print()
         for issue in issuelist:
@@ -273,11 +275,11 @@ class Issues(object):
                 d = d[:desc_width - 3]
                 d += '...'
             print(get_status_color(issue['status']), end='')
-            print(issue["status"].ljust(lens["status"] + padding), end='')
+            print(issue["status"].ljust(lens["status"]), end='')
             print(get_status_color(''), end='')
-            print(str(issue["number"]).ljust(lens["number"] + padding), end='')
-            print(issue["tag"].ljust(lens["tag"] + padding), end='')
-            print(issue["date"].ljust(lens["date"] + padding), end='')
+            print(str(issue["number"]).ljust(lens["number"]), end='')
+            print(issue["tag"].ljust(lens["tag"]), end='')
+            print(issue["date"].ljust(lens["date"]), end='')
             print(d, end='')
             print()
 
