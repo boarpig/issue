@@ -216,8 +216,11 @@ class Issues(object):
                 logging.error("ISSUES file already exists.")
                 print("Use --force to make one anyway.")
         else:
+            self.filename = "ISSUES"
             if compress:
                 self.gzip_file = True
+            else:
+                self.gzip_file = False
             logging.info("Created a new issue file.")
             self.save_issues()
 
