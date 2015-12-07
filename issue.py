@@ -327,7 +327,7 @@ class Issues(object):
             generic_open = gzip.open
         try:
             with generic_open(self.filename, mode="wt") as f:
-                json.dump(self.issues, f)
+                json.dump(self.issues, f, ensure_ascii=False, indent=4)
         except PermissionError:
             logging.error("No permission to write to the file. "
                           + "Changes were not saved.")
